@@ -1,0 +1,15 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle to frame the figure -->
+  <circle cx="60" cy="60" r="56" fill="none" stroke="#091E42" stroke-width="4"/>
+
+  <!-- Student figure silhouette -->
+  <path d="M60 30C53 30 48 35 48 42C48 49 53 54 60 54C67 54 72 49 72 42C72 35 67 30 60 30Z"
+        fill="#6A0DAD"/>
+
+  <!-- Book / Laptop base -->
+  <rect x="40" y="65" width="40" height="25" rx="3" fill="#091E42"/>
+  <line x1="40" y1="78" x2="80" y2="78" stroke="#6A0DAD" stroke-width="2"/>
+
+  <!-- Hands resting on book/laptop -->
+  <path d="M48 65C48 62 52 60 56 60H64C68 60 72 62 72 65V70H48V65Z" fill="#6A0DAD"/>
+</svg>

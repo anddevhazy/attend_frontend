@@ -1,0 +1,17 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer frame for balance -->
+  <circle cx="60" cy="60" r="56" fill="none" stroke="#091E42" stroke-width="4"/>
+
+  <!-- Lecturer silhouette (head + torso) -->
+  <path d="M60 32C53 32 48 37 48 44C48 51 53 56 60 56C67 56 72 51 72 44C72 37 67 32 60 32Z"
+        fill="#6A0DAD"/>
+  <path d="M48 70C48 64 53 60 60 60C67 60 72 64 72 70V78H48V70Z"
+        fill="#6A0DAD"/>
+
+  <!-- Chalkboard -->
+  <rect x="28" y="40" width="26" height="28" rx="2" fill="#091E42"/>
+  <line x1="28" y1="64" x2="54" y2="64" stroke="#6A0DAD" stroke-width="2"/>
+
+  <!-- Pointer -->
+  <line x1="72" y1="68" x2="95" y2="45" stroke="#091E42" stroke-width="3" stroke-linecap="round"/>
+</svg>

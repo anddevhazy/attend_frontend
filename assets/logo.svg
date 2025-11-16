@@ -1,0 +1,15 @@
+<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Location Pin -->
+  <path d="M40 8C28.954 8 20 16.954 20 28C20 41 40 72 40 72C40 72 60 41 60 28C60 16.954 51.046 8 40 8Z" 
+        fill="#6A0DAD"/>
+  
+  <!-- Fingerprint Circles -->
+  <path d="M40 24C35.582 24 32 27.582 32 32C32 36.418 35.582 40 40 40C44.418 40 48 36.418 48 32C48 27.582 44.418 24 40 24Z" 
+        stroke="#091E42" stroke-width="2" fill="none"/>
+  
+  <path d="M40 18C31.163 18 24 25.163 24 34C24 42.837 31.163 50 40 50C48.837 50 56 42.837 56 34C56 25.163 48.837 18 40 18Z" 
+        stroke="#091E42" stroke-width="2" stroke-linecap="round" stroke-dasharray="6 4" fill="none"/>
+  
+  <path d="M40 12C27.297 12 17 22.297 17 35C17 47.703 27.297 58 40 58C52.703 58 63 47.703 63 35C63 22.297 52.703 12 40 12Z" 
+        stroke="#091E42" stroke-width="2" stroke-linecap="round" stroke-dasharray="10 6" fill="none"/>
+</svg>
