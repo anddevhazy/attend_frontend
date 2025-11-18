@@ -17,6 +17,7 @@ dependencies:
   fluentui_system_icons: ^1.1.273
   flutter_svg: ^2.2.1
   flutter_screenutil: ^5.9.3
+  go_router: ^17.0.0
 
 dev_dependencies:
   flutter_test:
@@ -28,6 +29,4 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/logo.svg
-    - assets/student_illustration.svg
-    - assets/lecturer_illustration.svg
+    - assets/images/
