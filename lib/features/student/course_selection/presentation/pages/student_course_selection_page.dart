@@ -95,7 +95,7 @@ class _StudentCourseSelectionPageState
                   SizedBox(height: AppSpacing.md),
 
                   Text(
-                    'Choose all courses you’re registered for this semester',
+                    'Choose all courses you’re offering  this semester',
                     style: AppTextStyles.bodyLarge.copyWith(
                       color: AppColors.textPrimary.withOpacity(0.85),
                     ),
@@ -282,11 +282,6 @@ class _CourseTile extends StatelessWidget {
                     SizedBox(height: 4),
                     Text(
                       title,
-                      style: AppTextStyles.bodyMedium.copyWith(fontSize: 16),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      lecturer,
                       style: AppTextStyles.bodyMedium.copyWith(
                         color: AppColors.textPrimary.withOpacity(0.7),
                       ),
