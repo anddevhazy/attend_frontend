@@ -177,7 +177,10 @@ class _InputField extends StatelessWidget {
         TextFormField(
           keyboardType: keyboardType,
           obscureText: isPassword,
-          style: AppTextStyles.bodyMedium.copyWith(fontSize: 16),
+          style: AppTextStyles.bodyMedium.copyWith(
+            fontSize: 16,
+            color: AppColors.textPrimary,
+          ),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: AppTextStyles.inputHint,

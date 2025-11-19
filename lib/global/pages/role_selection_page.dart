@@ -52,7 +52,7 @@ class RoleSelectionPage extends StatelessWidget {
                 color: AppColors.primary,
                 onTap: () {
                   // Navigation to Student Signup
-                  context.goNamed(Routes.studentSignUpName);
+                  context.pushNamed(Routes.studentSignUpName);
                 },
               ),
 
