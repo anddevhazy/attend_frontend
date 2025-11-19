@@ -62,7 +62,9 @@ class Routes {
   static final GoRouter router = GoRouter(
     navigatorKey: rootNavigatorKey,
 
-    initialLocation: splashPath,
+    // initialLocation: splashPath,
+    initialLocation: studentDashboardPath,
+
     routes: [
       GoRoute(
         path: splashPath,

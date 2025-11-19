@@ -8,7 +8,7 @@ class StudentDashboardPage extends StatelessWidget {
   const StudentDashboardPage({super.key});
 
   // Toggle this to test both states
-  final bool hasActiveSession = true;
+  final bool hasActiveSession = false;
 
   @override
   Widget build(BuildContext context) {
@@ -33,13 +33,13 @@ class StudentDashboardPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Good morning',
+                        'Welcome',
                         style: AppTextStyles.bodyMedium.copyWith(
                           color: AppColors.textPrimary.withOpacity(0.7),
                         ),
                       ),
                       Text(
-                        'Adebayo John',
+                        'Elijah@gmail.com',
                         style: AppTextStyles.h2.copyWith(
                           fontSize: 20,
                           color: AppColors.primary,
@@ -199,10 +199,11 @@ class _NoActiveSessionView extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
             child: Text(
-              'Relax! Your lecturer will start the attendance session when class begins.',
+              'Relax! You will see an attendance session here when any of your lecturers starts a class.',
               style: AppTextStyles.bodyLarge.copyWith(
                 fontSize: 17,
                 height: 1.5,
+                color: AppColors.textPrimary,
               ),
               textAlign: TextAlign.center,
             ),

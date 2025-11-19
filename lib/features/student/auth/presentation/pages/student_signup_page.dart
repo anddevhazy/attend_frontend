@@ -174,7 +174,7 @@ class _StudentSignUpPageState extends State<StudentSignUpPage> {
                     if (value == null || value.isEmpty) {
                       return "Password is required";
                     }
-                    if (value.length < 6)
+                    if (value.length < 2)
                       return "Must be at least 6 characters";
                     return null;
                   },
