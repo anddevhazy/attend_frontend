@@ -1,7 +1,7 @@
 import 'package:attend/features/student/auth/presentation/pages/student_login_page.dart';
 import 'package:attend/features/student/auth/presentation/pages/student_signup_page.dart';
 import 'package:attend/features/student/course_selection/presentation/pages/student_course_selection_page.dart';
-import 'package:attend/features/student/dashboard/presentation/pages/student_dashboard_page.dart';
+import 'package:attend/features/student/home/presentation/pages/student_home_page.dart';
 import 'package:attend/global/pages/onboarding_screen.dart';
 import 'package:attend/global/pages/role_selection_page.dart';
 import 'package:attend/global/pages/splash_screen.dart';
@@ -64,7 +64,6 @@ class Routes {
 
     // initialLocation: splashPath,
     initialLocation: studentDashboardPath,
-
     routes: [
       GoRoute(
         path: splashPath,
@@ -124,7 +123,7 @@ class Routes {
       GoRoute(
         path: studentDashboardPath,
         name: studentDashboardName,
-        builder: (context, state) => const StudentDashboardPage(),
+        builder: (context, state) => const StudentHomePage(),
       ),
       // GoRoute(
       //   path: credentialUploadPath,
