@@ -2,7 +2,9 @@ import 'package:attend/global/constants/assets.dart';
 import 'package:attend/global/constants/colors.dart';
 import 'package:attend/global/constants/spacing.dart';
 import 'package:attend/global/constants/text_styles.dart';
+import 'package:attend/global/routes/routes.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class ActiveSessionPage extends StatelessWidget {
   const ActiveSessionPage({super.key});
@@ -31,7 +33,10 @@ class ActiveSessionPage extends StatelessWidget {
 
           Text(
             'Data Structures & Algorithms',
-            style: AppTextStyles.bodyLarge.copyWith(fontSize: 20),
+            style: AppTextStyles.bodyLarge.copyWith(
+              fontSize: 20,
+              color: AppColors.primary,
+            ),
           ),
           SizedBox(height: AppSpacing.sm),
           Text(
@@ -58,7 +63,12 @@ class ActiveSessionPage extends StatelessWidget {
               children: [
                 Icon(Icons.timer_outlined, color: AppColors.accent),
                 SizedBox(width: 8),
-                Text('Session ends in ', style: AppTextStyles.bodyLarge),
+                Text(
+                  'Session ends in ',
+                  style: AppTextStyles.bodyLarge.copyWith(
+                    color: AppColors.primary,
+                  ),
+                ),
                 Text(
                   '14:27',
                   style: AppTextStyles.h2.copyWith(
@@ -78,7 +88,7 @@ class ActiveSessionPage extends StatelessWidget {
             height: 64,
             child: ElevatedButton(
               onPressed: () {
-                // You will trigger Mark Attendance flow
+                context.goNamed(Routes.markAttendanceName);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,

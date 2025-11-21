@@ -13,25 +13,29 @@ import 'package:image_picker/image_picker.dart';
 
 class ActivateAccountPage extends StatefulWidget {
   final VoidCallback onActivated;
-  const ActivateAccountPage({super.key, required this.onActivated});
+  final String userEmail;
+
+  const ActivateAccountPage({
+    super.key,
+    required this.onActivated,
+    required this.userEmail,
+  });
 
   @override
-  State<ActivateAccountPage> createState() => ActivateAccountPageState();
+  State<ActivateAccountPage> createState() => _ActivateAccountPageState();
 }
 
-class ActivateAccountPageState extends State<ActivateAccountPage> {
+class _ActivateAccountPageState extends State<ActivateAccountPage> {
   String? _selectedLevel;
   XFile? _pickedImage;
 
   Future<void> _pickAndCropImage() async {
     final picker = ImagePicker();
     final picked = await picker.pickImage(source: ImageSource.gallery);
-
     if (picked == null) return;
 
     final cropped = await ImageCropper().cropImage(
       sourcePath: picked.path,
-      // aspectRatioPresets: [CropAspectRatioPreset.ratio4x3],
       aspectRatio: const CropAspectRatio(ratioX: 4, ratioY: 3),
       uiSettings: [
         AndroidUiSettings(
@@ -47,7 +51,7 @@ class ActivateAccountPageState extends State<ActivateAccountPage> {
       ],
     );
 
-    if (cropped != null) {
+    if (cropped != null && mounted) {
       setState(() => _pickedImage = XFile(cropped.path));
       _simulateExtraction();
     }
@@ -56,12 +60,10 @@ class ActivateAccountPageState extends State<ActivateAccountPage> {
   Future<void> _simulateExtraction() async {
     LoadingOverlay.show(context);
     await Future.delayed(const Duration(seconds: 3));
-
     LoadingOverlay.hide();
 
     if (!mounted) return;
 
-    // Show extracted data confirmation
     final confirmed = await AppDialog.confirm(
       context: context,
       title: "Is this correct?",
@@ -82,171 +84,246 @@ class ActivateAccountPageState extends State<ActivateAccountPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
+      appBar: AppBar(
+        // backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Row(
+          children: [
+            Text(
+              'Hello👋, ',
+              style: AppTextStyles.h2.copyWith(
+                fontSize: 20,
+                color: AppColors.primary,
+              ),
+            ),
+            Text(
+              widget.userEmail,
+              style: AppTextStyles.h2.copyWith(
+                fontSize: 18,
+                color: AppColors.primary,
+              ),
+            ),
+          ],
+        ),
+        centerTitle: false,
+      ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.xl),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                SizedBox(height: AppSpacing.xl),
-                Image.asset(AppAssets.signupStudentHero, height: 260),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+          child: Column(
+            children: [
+              SizedBox(height: AppSpacing.md),
 
-                SizedBox(height: AppSpacing.xxl),
+              // Hero illustration
+              Center(
+                child: Image.asset(AppAssets.signupStudentHero, height: 240),
+              ),
 
-                Text(
-                  'Activate Your Account',
-                  style: AppTextStyles.h1.copyWith(
-                    fontSize: 36,
-                    color: AppColors.primary,
-                  ),
-                  textAlign: TextAlign.center,
+              SizedBox(height: AppSpacing.xxl),
+
+              // Headline
+              Text(
+                'Activate Your Account',
+                style: AppTextStyles.h1.copyWith(
+                  fontSize: 38,
+                  color: AppColors.primary,
                 ),
+                textAlign: TextAlign.center,
+              ),
 
-                SizedBox(height: AppSpacing.lg),
+              SizedBox(height: AppSpacing.lg),
 
-                Text(
-                  'We need to verify your student status before you can mark attendance',
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                child: Text(
+                  'Verify your student status to start marking attendance',
                   style: AppTextStyles.bodyLarge.copyWith(
                     fontSize: 17,
+                    height: 1.5,
                     color: AppColors.textPrimary,
                   ),
                   textAlign: TextAlign.center,
                 ),
+              ),
 
-                SizedBox(height: AppSpacing.xxl),
+              SizedBox(height: AppSpacing.xxl),
 
-                // Level Selection
-                Text(
-                  'Select your current level',
-                  style: AppTextStyles.bodyLarge.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primary,
-                  ),
+              // Level Selection
+              Text(
+                "What's your current level?",
+                style: AppTextStyles.bodyLarge.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primary,
                 ),
-                SizedBox(height: AppSpacing.md),
+              ),
 
-                Row(
+              SizedBox(height: AppSpacing.md),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: LevelButtonWidget(
+                      label: "100L",
+                      isSelected: _selectedLevel == "100L",
+                      onTap: () => setState(() => _selectedLevel = "100L"),
+                    ),
+                  ),
+                  SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: LevelButtonWidget(
+                      label: "200L–600L",
+                      isSelected: _selectedLevel == "200L+",
+                      onTap: () => setState(() => _selectedLevel = "200L+"),
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: AppSpacing.xl),
+
+              // Document Upload Card
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(AppSpacing.xl),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: AppColors.primary.withOpacity(0.15),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withOpacity(0.08),
+                      blurRadius: 30,
+                      offset: Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: Column(
                   children: [
-                    Expanded(
-                      child: LevelButtonWidget(
-                        label: "100L",
-                        isSelected: _selectedLevel == "100L",
-                        onTap: () => setState(() => _selectedLevel = "100L"),
+                    // Icon + Title
+                    Container(
+                      padding: EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: AppColors.accent.withOpacity(0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.school_rounded,
+                        size: 48,
+                        color: AppColors.accent,
                       ),
                     ),
-                    SizedBox(width: AppSpacing.lg),
-                    Expanded(
-                      child: LevelButtonWidget(
-                        label: "200L–600L",
-                        isSelected: _selectedLevel == "200L+",
-                        onTap: () => setState(() => _selectedLevel = "200L+"),
+
+                    SizedBox(height: AppSpacing.xl),
+
+                    Text(
+                      _selectedLevel == "100L"
+                          ? "Upload your Course Form"
+                          : _selectedLevel == "200L+"
+                          ? "Upload last semester Results"
+                          : "Select your level first",
+                      style: AppTextStyles.h2.copyWith(
+                        fontSize: 22,
+                        color: AppColors.primary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+
+                    SizedBox(height: AppSpacing.xl),
+
+                    // Image Preview
+                    GestureDetector(
+                      onTap: _selectedLevel != null ? _pickAndCropImage : null,
+                      child: Container(
+                        height: 220,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: AppColors.primary.withOpacity(0.2),
+                            width: 2,
+                            style: BorderStyle.solid,
+                          ),
+                        ),
+                        child:
+                            _pickedImage != null
+                                ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(18),
+                                  child: Image.file(
+                                    File(_pickedImage!.path),
+                                    fit: BoxFit.cover,
+                                    errorBuilder:
+                                        (_, __, ___) => Icon(
+                                          Icons.error,
+                                          size: 60,
+                                          color: AppColors.error,
+                                        ),
+                                  ),
+                                )
+                                : Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.cloud_upload_outlined,
+                                      size: 64,
+                                      color: AppColors.primary.withOpacity(0.4),
+                                    ),
+                                    SizedBox(height: AppSpacing.md),
+                                    Text(
+                                      'Tap the button below to upload',
+                                      style: AppTextStyles.bodyLarge.copyWith(
+                                        color: AppColors.primary.withOpacity(
+                                          0.6,
+                                        ),
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                       ),
                     ),
                   ],
                 ),
+              ),
 
-                SizedBox(height: AppSpacing.xxl),
+              SizedBox(height: AppSpacing.xxl),
 
-                // Document Upload Card
-                Container(
-                  padding: EdgeInsets.all(AppSpacing.xl),
-                  decoration: BoxDecoration(
-                    color: AppColors.background,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: AppColors.primary.withOpacity(0.2),
+              // Activate Button
+              SizedBox(
+                width: double.infinity,
+                height: 64,
+                child: ElevatedButton(
+                  onPressed:
+                      _selectedLevel != null && _pickedImage != null
+                          ? _simulateExtraction
+                          : _selectedLevel != null
+                          ? _pickAndCropImage
+                          : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    disabledBackgroundColor: AppColors.primary.withOpacity(0.3),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
                     ),
+                    elevation: 12,
+                    shadowColor: AppColors.primary.withOpacity(0.4),
                   ),
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.description_rounded,
-                        size: 48,
-                        color: AppColors.accent,
-                      ),
-                      SizedBox(height: AppSpacing.md),
-                      Text(
-                        _selectedLevel == "100L"
-                            ? "Upload your Course Form"
-                            : _selectedLevel == "200L+"
-                            ? "Upload last semester Results"
-                            : "Select level first",
-                        style: AppTextStyles.h2.copyWith(fontSize: 20),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: AppSpacing.lg),
-                      if (_pickedImage != null)
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.file(
-                            File(_pickedImage!.path),
-                            height: 200,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                color: AppColors.primary.withOpacity(0.1),
-                                child: Icon(
-                                  Icons.error_outline,
-                                  color: AppColors.primary,
-                                  size: 50,
-                                ),
-                              );
-                            },
-                          ),
-                        )
-                      else
-                        Container(
-                          height: 180,
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.05),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: AppColors.primary.withOpacity(0.2),
-                              // style: BorderStyle.solid,
-                            ),
-                          ),
-                          child: Icon(
-                            Icons.add_a_photo_outlined,
-                            size: 50,
-                            color: AppColors.primary.withOpacity(0.5),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 20),
-                // Activate Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 64,
-                  child: ElevatedButton(
-                    onPressed:
-                        _selectedLevel != null ? _pickAndCropImage : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      disabledBackgroundColor: AppColors.primary.withOpacity(
-                        0.3,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                    child: Text(
-                      _pickedImage != null
-                          ? "Re-upload Document"
-                          : "Upload & Activate",
-                      style: AppTextStyles.bodyLarge.copyWith(
-                        fontSize: 19,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.white,
-                      ),
+                  child: Text(
+                    _pickedImage != null
+                        ? "Verify & Activate"
+                        : "Upload Document",
+                    style: AppTextStyles.bodyLarge.copyWith(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.white,
                     ),
                   ),
                 ),
+              ),
 
-                SizedBox(height: AppSpacing.xl),
-              ],
-            ),
+              SizedBox(height: AppSpacing.xl),
+            ],
           ),
         ),
       ),

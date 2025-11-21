@@ -89,7 +89,7 @@ class _StudentCourseSelectionPageState
 
     // Navigate after celebration
     await Future.delayed(const Duration(seconds: 3));
-    context.goNamed(Routes.studentDashboardName);
+    context.goNamed(Routes.studentHomeName);
   }
 
   @override

@@ -106,7 +106,7 @@ class StudentLoginPage extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     // Navigation to dashboard
-                    context.goNamed(Routes.studentDashboardName);
+                    context.goNamed(Routes.studentHomeName);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,

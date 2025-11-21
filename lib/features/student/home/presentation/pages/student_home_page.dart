@@ -20,12 +20,14 @@ class _StudentHomePageState extends State<StudentHomePage> {
   bool _isAccountActivated = false; // Set to false first time
 
   // Toggle this to test live session
-  final bool _hasActiveSession = false;
+  final bool _hasActiveSession = true;
 
   @override
   Widget build(BuildContext context) {
     if (!_isAccountActivated) {
       return ActivateAccountPage(
+        userEmail: "Elijah@gmail.com",
+
         onActivated: () {
           setState(() => _isAccountActivated = true);
           AppToast.show(

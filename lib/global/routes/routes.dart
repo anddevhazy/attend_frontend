@@ -1,7 +1,9 @@
 import 'package:attend/features/student/auth/presentation/pages/student_login_page.dart';
 import 'package:attend/features/student/auth/presentation/pages/student_signup_page.dart';
 import 'package:attend/features/student/course_selection/presentation/pages/student_course_selection_page.dart';
+import 'package:attend/features/student/home/presentation/pages/active_session_page.dart';
 import 'package:attend/features/student/home/presentation/pages/student_home_page.dart';
+import 'package:attend/features/student/mark_attendance/presentation/pages/mark_attendance_screen.dart';
 import 'package:attend/global/pages/onboarding_screen.dart';
 import 'package:attend/global/pages/role_selection_page.dart';
 import 'package:attend/global/pages/splash_screen.dart';
@@ -30,8 +32,8 @@ class Routes {
   static const String studentLoginPath = '/studentLogin';
   static const String studentLoginName = 'studentLogin';
 
-  static const String studentDashboardPath = '/studentDashboard';
-  static const String studentDashboardName = 'studentDashboard';
+  static const String studentHomePath = '/studentHome';
+  static const String studentHomeName = 'studentHome';
 
   static const String credentialUploadPath = '/credentialUpload';
   static const String credentialUploadName = 'credentialUpload';
@@ -51,6 +53,9 @@ class Routes {
   static const String createSessionPath = '/createSession';
   static const String createSessionName = 'createSession';
 
+  static const String activeSessionPath = '/activeSession';
+  static const String activeSessionName = 'activeSession';
+
   static const String reviewOverrideRequestPath = '/reviewOverrideRequest';
   static const String reviewOverrideRequestName = 'reviewOverrideRequest';
 
@@ -63,7 +68,7 @@ class Routes {
     navigatorKey: rootNavigatorKey,
 
     // initialLocation: splashPath,
-    initialLocation: studentDashboardPath,
+    initialLocation: studentHomePath,
     routes: [
       GoRoute(
         path: splashPath,
@@ -121,8 +126,8 @@ class Routes {
         builder: (context, state) => const StudentLoginPage(),
       ),
       GoRoute(
-        path: studentDashboardPath,
-        name: studentDashboardName,
+        path: studentHomePath,
+        name: studentHomeName,
         builder: (context, state) => const StudentHomePage(),
       ),
       // GoRoute(
@@ -130,11 +135,16 @@ class Routes {
       //   name: credentialUploadName,
       //   builder: (context, state) => const CredentialUploadPage(),
       // ),
-      // GoRoute(
-      //   path: markAttendancePath,
-      //   name: markAttendanceName,
-      //   builder: (context, state) => const MarkAttendancePage(),
-      // ),
+      GoRoute(
+        path: markAttendancePath,
+        name: markAttendanceName,
+        builder: (context, state) => const MarkAttendanceScreen(),
+      ),
+      GoRoute(
+        path: activeSessionPath,
+        name: activeSessionName,
+        builder: (context, state) => const ActiveSessionPage(),
+      ),
       // GoRoute(
       //   path: attendanceResultPath,
       //   name: attendanceResultName,

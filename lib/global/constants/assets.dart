@@ -33,4 +33,10 @@ class AppAssets {
       'assets/images/dashboard_active_class.png';
   static const String dashboardAvatarPlaceholder =
       'assets/images/avatar_placeholder.png';
+
+  // Mark Attendance flow
+  static const String markAttendanceHero =
+      'assets/images/mark_attendance_hero.png';
+  static const String fingerprintAnimation =
+      'assets/lottie/fingerprint.json'; // if using Lottie
 }
