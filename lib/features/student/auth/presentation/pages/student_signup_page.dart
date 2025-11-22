@@ -1,5 +1,4 @@
 import 'package:attend/global/components/app_toast.dart';
-import 'package:attend/global/components/attendance_result_overlay.dart';
 import 'package:attend/global/components/loading_overlay.dart';
 import 'package:attend/global/constants/assets.dart';
 import 'package:attend/global/constants/colors.dart';

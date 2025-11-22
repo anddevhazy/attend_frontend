@@ -13,7 +13,7 @@ class MarkAttendanceScreen extends StatefulWidget {
 
 class _MarkAttendanceScreenState extends State<MarkAttendanceScreen>
     with TickerProviderStateMixin {
-  int currentStep = 0; // 0 = Location, 1 = Biometric, 2 = Selfie, 3 = Result
+  int currentStep = 0; // 0 = Location,  1 = Selfie, 2 = Result
   late AnimationController _pulseController;
 
   @override
@@ -35,14 +35,6 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
-      appBar: AppBar(
-        // backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.close_rounded, color: AppColors.primary),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -115,7 +107,7 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen>
                     // Step indicator
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(3, (i) {
+                      children: List.generate(2, (i) {
                         return AnimatedContainer(
                           duration: Duration(milliseconds: 400),
                           margin: EdgeInsets.symmetric(horizontal: 6),
@@ -180,11 +172,9 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen>
   String _getTitle() {
     switch (currentStep) {
       case 0:
-        return 'Verifying Location';
+        return 'Getting Location';
       case 1:
-        return 'Touch the Sensor';
-      case 2:
-        return 'Smile for Selfie';
+        return 'Verify that you are who you claim you are';
       default:
         return 'Processing...';
     }
@@ -195,8 +185,6 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen>
       case 0:
         return 'Make sure you’re inside the lecture hall geofence';
       case 1:
-        return 'Use your registered fingerprint to confirm it’s really you';
-      case 2:
         return 'One quick selfie for verification';
       default:
         return 'Almost there — finalizing your attendance';
@@ -208,8 +196,6 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen>
       case 0:
         return 'Location Verified';
       case 1:
-        return 'Authenticate Fingerprint';
-      case 2:
         return 'Take Selfie';
       default:
         return 'Complete Attendance';

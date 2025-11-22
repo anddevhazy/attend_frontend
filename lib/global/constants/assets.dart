@@ -37,6 +37,11 @@ class AppAssets {
   // Mark Attendance flow
   static const String markAttendanceHero =
       'assets/images/mark_attendance_hero.png';
-  static const String fingerprintAnimation =
-      'assets/lottie/fingerprint.json'; // if using Lottie
+  static const String fingerprintAnimation = 'assets/lottie/fingerprint.json';
+
+  // Override request
+  static const String overrideRequestHero =
+      'assets/images/override_request_hero.png';
+  static const String overrideSelfiePlaceholder =
+      'assets/images/selfie_placeholder.png';
 }

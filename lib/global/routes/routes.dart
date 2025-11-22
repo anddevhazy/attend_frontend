@@ -4,6 +4,7 @@ import 'package:attend/features/student/course_selection/presentation/pages/stud
 import 'package:attend/features/student/home/presentation/pages/active_session_page.dart';
 import 'package:attend/features/student/home/presentation/pages/student_home_page.dart';
 import 'package:attend/features/student/mark_attendance/presentation/pages/mark_attendance_screen.dart';
+import 'package:attend/features/student/mark_attendance/presentation/pages/request_manual_override_page.dart';
 import 'package:attend/global/pages/onboarding_screen.dart';
 import 'package:attend/global/pages/role_selection_page.dart';
 import 'package:attend/global/pages/splash_screen.dart';
@@ -26,38 +27,38 @@ class Routes {
   static const String studentCourseSelectionPath = '/studentCourseSelection';
   static const String studentCourseSelectionName = 'studentCourseSelection';
 
-  static const String lecturerSignUpPath = '/lecturerSignUp';
-  static const String lecturerSignUpName = 'lecturerSignUp';
-
   static const String studentLoginPath = '/studentLogin';
   static const String studentLoginName = 'studentLogin';
 
   static const String studentHomePath = '/studentHome';
   static const String studentHomeName = 'studentHome';
 
-  static const String credentialUploadPath = '/credentialUpload';
-  static const String credentialUploadName = 'credentialUpload';
+  static const String activeSessionPath = '/activeSession';
+  static const String activeSessionName = 'activeSession';
 
   static const String markAttendancePath = '/markAttendance';
   static const String markAttendanceName = 'markAttendance';
 
-  static const String attendanceResultPath = '/attendanceResult';
-  static const String attendanceResultName = 'attendanceResult';
+  static const String requestManualOverridePath = '/requestManualOverride';
+  static const String requestManualOverrideName = 'requestManualOverride';
 
-  static const String overrideRequestPath = '/overrideRequest';
-  static const String overrideRequestName = 'overrideRequest';
+  // static const String lecturerSignUpPath = '/lecturerSignUp';
+  // static const String lecturerSignUpName = 'lecturerSignUp';
 
-  static const String lecturerHomePath = '/lecturerHome';
-  static const String lecturerHomeName = 'lecturerHome';
+  // static const String credentialUploadPath = '/credentialUpload';
+  // static const String credentialUploadName = 'credentialUpload';
 
-  static const String createSessionPath = '/createSession';
-  static const String createSessionName = 'createSession';
+  //   static const String attendanceResultPath = '/attendanceResult';
+  // static const String attendanceResultName = 'attendanceResult';
 
-  static const String activeSessionPath = '/activeSession';
-  static const String activeSessionName = 'activeSession';
+  //   static const String lecturerHomePath = '/lecturerHome';
+  // static const String lecturerHomeName = 'lecturerHome';
 
-  static const String reviewOverrideRequestPath = '/reviewOverrideRequest';
-  static const String reviewOverrideRequestName = 'reviewOverrideRequest';
+  // static const String createSessionPath = '/createSession';
+  // static const String createSessionName = 'createSession';
+
+  //   static const String reviewOverrideRequestPath = '/reviewOverrideRequest';
+  // static const String reviewOverrideRequestName = 'reviewOverrideRequest';
 
   static final GlobalKey<NavigatorState> rootNavigatorKey =
       GlobalKey<NavigatorState>();
@@ -69,6 +70,8 @@ class Routes {
 
     // initialLocation: splashPath,
     initialLocation: studentHomePath,
+
+    // initialLocation: requestManualOverridePath,
     routes: [
       GoRoute(
         path: splashPath,
@@ -115,11 +118,6 @@ class Routes {
         name: studentCourseSelectionName,
         builder: (context, state) => const StudentCourseSelectionPage(),
       ),
-      // GoRoute(
-      //   path: lecturerSignUpPath,
-      //   name: lecturerSignUpName,
-      //   builder: (context, state) => const LecturerSignUpPage(),
-      // ),
       GoRoute(
         path: studentLoginPath,
         name: studentLoginName,
@@ -130,31 +128,38 @@ class Routes {
         name: studentHomeName,
         builder: (context, state) => const StudentHomePage(),
       ),
-      // GoRoute(
-      //   path: credentialUploadPath,
-      //   name: credentialUploadName,
-      //   builder: (context, state) => const CredentialUploadPage(),
-      // ),
+      GoRoute(
+        path: activeSessionPath,
+        name: activeSessionName,
+        builder: (context, state) => const ActiveSessionPage(),
+      ),
       GoRoute(
         path: markAttendancePath,
         name: markAttendanceName,
         builder: (context, state) => const MarkAttendanceScreen(),
       ),
       GoRoute(
-        path: activeSessionPath,
-        name: activeSessionName,
-        builder: (context, state) => const ActiveSessionPage(),
+        path: requestManualOverridePath,
+        name: requestManualOverrideName,
+        builder: (context, state) => const RequestManualOverridePage(),
       ),
+
+      // GoRoute(
+      //   path: credentialUploadPath,
+      //   name: credentialUploadName,
+      //   builder: (context, state) => const CredentialUploadPage(),
+      // ),
+      // GoRoute(
+      //   path: lecturerSignUpPath,
+      //   name: lecturerSignUpName,
+      //   builder: (context, state) => const LecturerSignUpPage(),
+      // ),
       // GoRoute(
       //   path: attendanceResultPath,
       //   name: attendanceResultName,
       //   builder: (context, state) => const AttendanceResultPage(),
       // ),
-      // GoRoute(
-      //   path: overrideRequestPath,
-      //   name: overrideRequestName,
-      //   builder: (context, state) => const OverrideRequestPage(),
-      // ),
+
       // GoRoute(
       //   path: lecturerHomePath,
       //   name: lecturerHomeName,
