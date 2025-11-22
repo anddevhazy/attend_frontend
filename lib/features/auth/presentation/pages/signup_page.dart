@@ -8,14 +8,14 @@ import 'package:attend/global/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class StudentSignUpPage extends StatefulWidget {
-  const StudentSignUpPage({super.key});
+class SignupPage extends StatefulWidget {
+  const SignupPage({super.key});
 
   @override
-  State<StudentSignUpPage> createState() => _StudentSignUpPageState();
+  State<SignupPage> createState() => _SignupPageState();
 }
 
-class _StudentSignUpPageState extends State<StudentSignUpPage> {
+class _SignupPageState extends State<SignupPage> {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
@@ -29,7 +29,7 @@ class _StudentSignUpPageState extends State<StudentSignUpPage> {
     });
   }
 
-  // Add this method inside _StudentSignUpPageState
+  // Add this method inside _SignupPageState
   Future<void> _simulateSignUp() async {
     // 1. Show loading
     LoadingOverlay.show(context);
@@ -93,7 +93,7 @@ class _StudentSignUpPageState extends State<StudentSignUpPage> {
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        // backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: Icon(
@@ -315,7 +315,7 @@ class _InputFieldState extends State<_InputField> {
             });
             widget.onChanged?.call(value);
             final parentState =
-                context.findAncestorStateOfType<_StudentSignUpPageState>();
+                context.findAncestorStateOfType<_SignupPageState>();
             parentState?._validate();
           },
           style: AppTextStyles.bodyMedium.copyWith(

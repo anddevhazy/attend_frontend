@@ -21,6 +21,10 @@ class AppAssets {
       'assets/images/signup_student_hero.png';
   static const String loginStudentHero = 'assets/images/login_student_hero.png';
 
+  //  Auth
+  static const String signupHero = 'assets/images/signup_hero.png';
+  static const String loginHero = 'assets/images/login_hero.png';
+
   // Student Course Selection
   static const String courseSelectionHero =
       'assets/images/course_selection_hero.png';
@@ -44,4 +48,22 @@ class AppAssets {
       'assets/images/override_request_hero.png';
   static const String overrideSelfiePlaceholder =
       'assets/images/selfie_placeholder.png';
+
+  // Lecturer dashboard
+  static const String lecturerDashboardHero =
+      'assets/images/lecturer_dashboard_hero.png';
+  static const String lecturerNoSession =
+      'assets/images/lecturer_no_session.png';
+
+  // Create session
+  static const String createSessionHero =
+      'assets/images/create_session_hero.png';
+
+  // Manual override review (Lecturer side)
+  static const String overrideReviewHero =
+      'assets/images/override_review_hero.png';
+  static const String studentSelfieSample =
+      'assets/images/student_selfie_sample.png';
+  static const String previousOwnerSelfieSample =
+      'assets/images/previous_owner_selfie.png';
 }

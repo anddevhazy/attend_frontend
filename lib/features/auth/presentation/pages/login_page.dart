@@ -6,8 +6,8 @@ import 'package:attend/global/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class StudentLoginPage extends StatelessWidget {
-  const StudentLoginPage({super.key});
+class LoginPage extends StatelessWidget {
+  const LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {

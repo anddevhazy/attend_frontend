@@ -65,7 +65,7 @@ class RoleSelectionPage extends StatelessWidget {
                 subtitle: 'Create sessions\nVerify presence\nExport records',
                 color: AppColors.accent,
                 onTap: () {
-                  // Navigation to Lecturer Signup
+                  context.pushNamed(Routes.studentSignUpName);
                 },
               ),
 
