@@ -1,91 +1,17 @@
-import 'package:attend/global/constants/assets.dart';
 import 'package:attend/global/constants/colors.dart';
 import 'package:attend/global/constants/spacing.dart';
 import 'package:attend/global/constants/text_styles.dart';
-import 'package:attend/global/routes/routes.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
-class RoleSelectionPage extends StatelessWidget {
-  const RoleSelectionPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-          child: Column(
-            children: [
-              const Spacer(flex: 3),
-
-              // Headline
-              Text(
-                'Welcome to Attend',
-                style: AppTextStyles.h1.copyWith(
-                  fontSize: 36,
-                  height: 1.1,
-                  color: AppColors.primary,
-                ),
-                textAlign: TextAlign.center,
-              ),
-
-              SizedBox(height: AppSpacing.md),
-
-              Text(
-                'Choose your role to continue',
-                style: AppTextStyles.bodyLarge.copyWith(
-                  fontSize: 18,
-                  color: AppColors.textPrimary.withOpacity(0.8),
-                ),
-                textAlign: TextAlign.center,
-              ),
-
-              const Spacer(flex: 4),
-
-              // Student Card
-              _RoleCard(
-                image: AppAssets.roleStudent,
-                title: 'Student',
-                subtitle: 'Mark attendance\nCheck records\nStay verified',
-                color: AppColors.primary,
-                onTap: () {
-                  // Navigation to Student Signup
-                  context.pushNamed(Routes.studentSignUpName);
-                },
-              ),
-
-              SizedBox(height: AppSpacing.xl),
-
-              // Lecturer Card
-              _RoleCard(
-                image: AppAssets.roleLecturer,
-                title: 'Lecturer',
-                subtitle: 'Create sessions\nVerify presence\nExport records',
-                color: AppColors.accent,
-                onTap: () {
-                  context.pushNamed(Routes.studentSignUpName);
-                },
-              ),
-
-              const Spacer(flex: 5),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _RoleCard extends StatelessWidget {
+class RoleCardWidget extends StatelessWidget {
   final String image;
   final String title;
   final String subtitle;
   final Color color;
   final VoidCallback onTap;
 
-  const _RoleCard({
+  const RoleCardWidget({
+    super.key,
     required this.image,
     required this.title,
     required this.subtitle,

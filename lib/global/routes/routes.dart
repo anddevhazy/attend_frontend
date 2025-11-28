@@ -9,7 +9,7 @@ import 'package:attend/features/student/home/presentation/pages/student_home_pag
 import 'package:attend/features/student/mark_attendance/presentation/pages/mark_attendance_screen.dart';
 import 'package:attend/features/student/mark_attendance/presentation/pages/request_manual_override_page.dart';
 import 'package:attend/global/pages/onboarding_screen.dart';
-import 'package:attend/global/pages/role_selection_page.dart';
+import 'package:attend/global/pages/role_selection/presentation/pages/role_selection_page.dart';
 import 'package:attend/global/pages/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
