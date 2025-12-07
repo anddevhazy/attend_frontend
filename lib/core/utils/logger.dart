@@ -1,17 +1,18 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'dart:developer' as developer;
 
-abstract class NetworkInfo {
-  Future<bool> get isConnected;
+abstract class Logger {
+  void d(String message, {Object? error, StackTrace? stackTrace});
+  void e(String message, {Object? error, StackTrace? stackTrace});
 }
 
-class NetworkInfoImpl implements NetworkInfo {
-  final Connectivity connectivity;
-
-  NetworkInfoImpl(this.connectivity);
+class AppLogger implements Logger {
+  @override
+  void d(String message, {Object? error, StackTrace? stackTrace}) {
+    developer.log(message, name: 'DEBUG', error: error, stackTrace: stackTrace);
+  }
 
   @override
-  Future<bool> get isConnected async {
-    final result = await connectivity.checkConnectivity();
-    return result != ConnectivityResult.none;
+  void e(String message, {Object? error, StackTrace? stackTrace}) {
+    developer.log(message, name: 'ERROR', error: error, stackTrace: stackTrace);
   }
 }
