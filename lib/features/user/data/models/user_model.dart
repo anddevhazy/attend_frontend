@@ -1,31 +1,23 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:whatsapp_clone/features/auth/domain/entities/auth_user_entity.dart';
+import 'package:whatsapp_clone/features/user/domain/entities/user_entity.dart';
 
-part 'auth_response_model.freezed.dart';
-part 'auth_response_model.g.dart';
-
-@freezed
-class AuthResponseModel with _$AuthResponseModel {
-  const factory AuthResponseModel({
-    required String accessToken,
-    required String refreshToken,
-    required UserModel user,
-  }) = _AuthResponseModel;
-
-  factory AuthResponseModel.fromJson(Map<String, dynamic> json) =>
-      _$AuthResponseModelFromJson(json);
-}
+part 'user_model.freezed.dart';
+part 'user_model.g.dart';
 
 @freezed
 class UserModel with _$UserModel {
+  const UserModel._();
+
   const factory UserModel({
     required String uid,
-    required String email,
     required String name,
     required String phoneNumber,
+    required String email,
     String? photoUrl,
+    String? status,
     @Default(false) bool isOnline,
     DateTime? lastSeen,
+    DateTime? createdAt,
   }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>
@@ -33,13 +25,15 @@ class UserModel with _$UserModel {
 }
 
 extension UserModelX on UserModel {
-  AuthUserEntity toEntity() => AuthUserEntity(
+  UserEntity toEntity() => UserEntity(
     uid: uid,
-    email: email,
     name: name,
     phoneNumber: phoneNumber,
+    email: email,
     photoUrl: photoUrl,
+    status: status,
     isOnline: isOnline,
     lastSeen: lastSeen,
+    createdAt: createdAt,
   );
 }
