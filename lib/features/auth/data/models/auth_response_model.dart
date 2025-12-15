@@ -1,45 +1,22 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:whatsapp_clone/features/auth/domain/entities/auth_user_entity.dart';
+import 'package:attend/features/auth/data/models/student_model.dart';
 
-part 'auth_response_model.freezed.dart';
-part 'auth_response_model.g.dart';
+class AuthResponseModel {
+  final String accessToken;
+  final String refreshToken;
+  final StudentModel student;
 
-@freezed
-class AuthResponseModel with _$AuthResponseModel {
-  const factory AuthResponseModel({
-    required String accessToken,
-    required String refreshToken,
-    required UserModel user,
-  }) = _AuthResponseModel;
+  const AuthResponseModel({
+    required this.accessToken,
+    required this.refreshToken,
+    required this.student,
+  });
 
-  factory AuthResponseModel.fromJson(Map<String, dynamic> json) =>
-      _$AuthResponseModelFromJson(json);
-}
-
-@freezed
-class UserModel with _$UserModel {
-  const factory UserModel({
-    required String uid,
-    required String email,
-    required String name,
-    required String phoneNumber,
-    String? photoUrl,
-    @Default(false) bool isOnline,
-    DateTime? lastSeen,
-  }) = _UserModel;
-
-  factory UserModel.fromJson(Map<String, dynamic> json) =>
-      _$UserModelFromJson(json);
-}
-
-extension UserModelX on UserModel {
-  AuthUserEntity toEntity() => AuthUserEntity(
-    uid: uid,
-    email: email,
-    name: name,
-    phoneNumber: phoneNumber,
-    photoUrl: photoUrl,
-    isOnline: isOnline,
-    lastSeen: lastSeen,
-  );
+  // From JSON
+  factory AuthResponseModel.fromJson(Map<String, dynamic> json) {
+    return AuthResponseModel(
+      accessToken: json['accessToken'] as String,
+      refreshToken: json['refreshToken'] as String,
+      student: StudentModel.fromJson(json['user'] as Map<String, dynamic>),
+    );
+  }
 }

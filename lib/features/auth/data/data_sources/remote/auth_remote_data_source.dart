@@ -1,27 +1,17 @@
-import 'package:retrofit/retrofit.dart';
-import 'package:dio/dio.dart';
-import 'package:whatsapp_clone/features/auth/data/models/auth_response_model.dart';
+import 'package:attend/core/error/failures.dart';
+import 'package:attend/features/auth/domain/entities/student_entity.dart';
+import 'package:dartz/dartz.dart';
 
-part 'auth_remote_data_source.g.dart';
-
-@RestApi()
 abstract class AuthRemoteDataSource {
-  factory AuthRemoteDataSource(Dio dio, {String baseUrl}) =
-      _AuthRemoteDataSource;
+  // Future<Either<Failure, AuthUserEntity>> login({
+  //   required String phoneOrEmail,
+  //   required String password,
+  // });
+  Future<Either<Failure, StudentEntity>> studentSignUp(
+    StudentEntity studentEntity,
+  );
 
-  @POST('/auth/login')
-  Future<AuthResponseModel> login({@Body() required Map<String, dynamic> body});
+  // Future<Either<Failure, Unit>> logout();
 
-  @POST('/auth/register')
-  Future<AuthResponseModel> register({
-    @Body() required Map<String, dynamic> body,
-  });
-
-  @POST('/auth/auth/refresh-token')
-  Future<AuthResponseModel> refreshToken({
-    @Field('refreshToken') required String refreshToken,
-  });
-
-  @POST('/auth/logout')
-  Future<void> logout();
+  // Future<Either<Failure, AuthStudentEntity>> refreshToken(String refreshToken);
 }

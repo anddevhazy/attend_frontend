@@ -1,20 +1,17 @@
+import 'package:attend/core/error/failures.dart';
+import 'package:attend/features/auth/domain/entities/student_entity.dart';
 import 'package:dartz/dartz.dart';
-import 'package:whatsapp_clone/core/error/failures.dart';
-import 'package:whatsapp_clone/features/auth/domain/entities/auth_user_entity.dart';
 
 abstract class AuthRepository {
-  Future<Either<Failure, AuthUserEntity>> login({
-    required String phoneOrEmail,
-    required String password,
-  });
+  // Future<Either<Failure, AuthUserEntity>> login({
+  //   required String phoneOrEmail,
+  //   required String password,
+  // });
+  Future<Either<Failure, StudentEntity>> studentSignUp(
+    StudentEntity studentEntity,
+  );
 
-  Future<Either<Failure, AuthUserEntity>> register({
-    required String name,
-    required String phoneNumber,
-    required String password,
-  });
+  // Future<Either<Failure, Unit>> logout();
 
-  Future<Either<Failure, Unit>> logout();
-
-  Future<Either<Failure, AuthUserEntity>> refreshToken(String refreshToken);
+  // Future<Either<Failure, AuthStudentEntity>> refreshToken(String refreshToken);
 }

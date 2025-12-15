@@ -11,15 +11,6 @@ class StudentEntity extends Equatable {
     required this.password,
   });
 
-  // Implement the copyWith method
-  StudentEntity copyWith({String? studentId, String? email, String? password}) {
-    return StudentEntity(
-      studentId: studentId ?? this.studentId,
-      email: email ?? this.email,
-      password: password ?? this.password,
-    );
-  }
-
   @override
   List<Object?> get props => [studentId, email, password];
 }

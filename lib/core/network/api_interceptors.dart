@@ -1,6 +1,6 @@
+import 'package:attend/core/utils/app_logger.dart';
 import 'package:attend/storage/token_storage_provider.dart';
 import 'package:dio/dio.dart';
-import 'package:logger/logger.dart';
 
 class AuthInterceptor extends Interceptor {
   final TokenStorageProvider tokenStorage;
@@ -21,7 +21,7 @@ class AuthInterceptor extends Interceptor {
 }
 
 class LoggingInterceptor extends Interceptor {
-  final Logger logger;
+  final AppLogger logger;
 
   LoggingInterceptor(this.logger);
 

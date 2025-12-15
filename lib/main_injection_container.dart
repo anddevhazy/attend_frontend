@@ -1,22 +1,20 @@
+import 'package:attend/features/auth/auth_injection_container.dart';
+import 'package:attend/service_locator.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:get_it/get_it.dart';
-
 import 'core/network/api_client.dart';
 import 'core/network/api_interceptors.dart';
 import 'core/network/network_info.dart';
-import 'core/utils/logger.dart';
+import 'core/utils/app_logger.dart';
 import 'storage/secure_storage_provider.dart';
 import 'storage/token_storage_provider.dart';
-
-final sl = GetIt.instance;
 
 Future<void> init() async {
   // * CORE
 
   // Logger
-  sl.registerLazySingleton<Logger>(() => AppLogger());
+  sl.registerLazySingleton<AppLogger>(() => AppLoggerImpl());
 
   // Connectivity & Network info
   sl.registerLazySingleton<Connectivity>(() => Connectivity());
@@ -43,7 +41,7 @@ Future<void> init() async {
   // ApiClient with interceptors
   sl.registerLazySingleton<ApiClient>(() {
     final dio = sl<Dio>();
-    final logger = sl<Logger>();
+    final logger = sl<AppLogger>();
     final tokenStorage = sl<TokenStorageProvider>();
 
     dio.interceptors.addAll([
@@ -56,8 +54,8 @@ Future<void> init() async {
 
   // * FEATURES
 
-  await userInjectionContainer();
-  await chatInjectionContainer();
-  await statusInjectionContainer();
-  await callInjectionContainer();
+  await authInjectionContainer();
+  // await chatInjectionContainer();
+  // await statusInjectionContainer();
+  // await callInjectionContainer();
 }

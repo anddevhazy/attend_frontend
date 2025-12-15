@@ -5,13 +5,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i4;
 
-import 'package:attend/features/auth/domain/entities/lecturer_entity.dart'
-    as _i7;
-import 'package:attend/features/auth/domain/entities/student_entity.dart'
-    as _i6;
 import 'package:attend/features/auth/domain/repositories/auth_repository.dart'
     as _i3;
-import 'package:attend/global/error/failures.dart' as _i5;
 import 'package:dartz/dartz.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 
@@ -44,68 +39,75 @@ class MockAuthRepository extends _i1.Mock implements _i3.AuthRepository {
   }
 
   @override
-  _i4.Future<_i2.Either<_i5.Failure, _i2.Unit>> studentSignUp(
-    _i6.StudentEntity? studentEntity,
-  ) =>
+  _i4.Future<_i2.Either<dynamic, dynamic>> login({
+    required String? phoneOrEmail,
+    required String? password,
+  }) =>
       (super.noSuchMethod(
-            Invocation.method(#studentSignUp, [studentEntity]),
-            returnValue: _i4.Future<_i2.Either<_i5.Failure, _i2.Unit>>.value(
-              _FakeEither_0<_i5.Failure, _i2.Unit>(
+            Invocation.method(#login, [], {
+              #phoneOrEmail: phoneOrEmail,
+              #password: password,
+            }),
+            returnValue: _i4.Future<_i2.Either<dynamic, dynamic>>.value(
+              _FakeEither_0<dynamic, dynamic>(
                 this,
-                Invocation.method(#studentSignUp, [studentEntity]),
+                Invocation.method(#login, [], {
+                  #phoneOrEmail: phoneOrEmail,
+                  #password: password,
+                }),
               ),
             ),
           )
-          as _i4.Future<_i2.Either<_i5.Failure, _i2.Unit>>);
+          as _i4.Future<_i2.Either<dynamic, dynamic>>);
 
   @override
-  _i4.Future<_i2.Either<_i5.Failure, _i6.StudentEntity>> studentLogin(
-    String? email,
-    String? password,
-  ) =>
+  _i4.Future<_i2.Either<dynamic, dynamic>> register({
+    required String? name,
+    required String? phoneNumber,
+    required String? password,
+  }) =>
       (super.noSuchMethod(
-            Invocation.method(#studentLogin, [email, password]),
-            returnValue:
-                _i4.Future<_i2.Either<_i5.Failure, _i6.StudentEntity>>.value(
-                  _FakeEither_0<_i5.Failure, _i6.StudentEntity>(
-                    this,
-                    Invocation.method(#studentLogin, [email, password]),
-                  ),
-                ),
+            Invocation.method(#register, [], {
+              #name: name,
+              #phoneNumber: phoneNumber,
+              #password: password,
+            }),
+            returnValue: _i4.Future<_i2.Either<dynamic, dynamic>>.value(
+              _FakeEither_0<dynamic, dynamic>(
+                this,
+                Invocation.method(#register, [], {
+                  #name: name,
+                  #phoneNumber: phoneNumber,
+                  #password: password,
+                }),
+              ),
+            ),
           )
-          as _i4.Future<_i2.Either<_i5.Failure, _i6.StudentEntity>>);
+          as _i4.Future<_i2.Either<dynamic, dynamic>>);
 
   @override
-  _i4.Future<_i2.Either<_i5.Failure, _i7.LecturerEntity>> lecturerSignUp(
-    String? email,
-    String? password,
-  ) =>
+  _i4.Future<_i2.Either<dynamic, _i2.Unit>> logout() =>
       (super.noSuchMethod(
-            Invocation.method(#lecturerSignUp, [email, password]),
-            returnValue:
-                _i4.Future<_i2.Either<_i5.Failure, _i7.LecturerEntity>>.value(
-                  _FakeEither_0<_i5.Failure, _i7.LecturerEntity>(
-                    this,
-                    Invocation.method(#lecturerSignUp, [email, password]),
-                  ),
-                ),
+            Invocation.method(#logout, []),
+            returnValue: _i4.Future<_i2.Either<dynamic, _i2.Unit>>.value(
+              _FakeEither_0<dynamic, _i2.Unit>(
+                this,
+                Invocation.method(#logout, []),
+              ),
+            ),
           )
-          as _i4.Future<_i2.Either<_i5.Failure, _i7.LecturerEntity>>);
+          as _i4.Future<_i2.Either<dynamic, _i2.Unit>>);
 
   @override
-  _i4.Future<_i2.Either<_i5.Failure, _i7.LecturerEntity>> lecturerLogin(
-    String? email,
-    String? password,
-  ) =>
+  _i4.Future<_i2.Either<dynamic, dynamic>> refreshToken(String? refreshToken) =>
       (super.noSuchMethod(
-            Invocation.method(#lecturerLogin, [email, password]),
-            returnValue:
-                _i4.Future<_i2.Either<_i5.Failure, _i7.LecturerEntity>>.value(
-                  _FakeEither_0<_i5.Failure, _i7.LecturerEntity>(
-                    this,
-                    Invocation.method(#lecturerLogin, [email, password]),
-                  ),
-                ),
+            Invocation.method(#refreshToken, [refreshToken]),
+            returnValue: _i4.Future<_i2.Either<dynamic, dynamic>>.value(
+              _FakeEither_0<dynamic, dynamic>(
+                this,
+                Invocation.method(#refreshToken, [refreshToken]),
+              ),
+            ),
           )
-          as _i4.Future<_i2.Either<_i5.Failure, _i7.LecturerEntity>>);
+          as _i4.Future<_i2.Either<dynamic, dynamic>>);
 }
