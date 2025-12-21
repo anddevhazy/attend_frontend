@@ -8,6 +8,7 @@ import 'package:attend/features/student/home/presentation/pages/active_session_p
 import 'package:attend/features/student/home/presentation/pages/student_home_page.dart';
 import 'package:attend/features/student/mark_attendance/presentation/pages/mark_attendance_screen.dart';
 import 'package:attend/features/student/mark_attendance/presentation/pages/request_manual_override_page.dart';
+import 'package:attend/global/enums/role.dart';
 import 'package:attend/global/pages/onboarding_screen.dart';
 import 'package:attend/global/pages/role_selection/presentation/pages/role_selection_page.dart';
 import 'package:attend/global/pages/splash_screen.dart';
@@ -110,7 +111,10 @@ class Routes {
       GoRoute(
         path: studentSignUpPath,
         name: studentSignUpName,
-        builder: (context, state) => const SignupPage(),
+        builder: (context, state) {
+          final role = state.extra as Role;
+          return SignupPage(role: role);
+        },
       ),
       GoRoute(
         path: studentCourseSelectionPath,

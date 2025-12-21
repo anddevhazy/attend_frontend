@@ -2,6 +2,7 @@ import 'package:attend/global/constants/assets.dart';
 import 'package:attend/global/constants/colors.dart';
 import 'package:attend/global/constants/spacing.dart';
 import 'package:attend/global/constants/text_styles.dart';
+import 'package:attend/global/enums/role.dart';
 import 'package:attend/global/pages/role_selection/presentation/widgets/role_card_widget.dart';
 import 'package:attend/global/routes/routes.dart';
 import 'package:flutter/material.dart';
@@ -53,7 +54,10 @@ class RoleSelectionPage extends StatelessWidget {
                 color: AppColors.primary,
                 onTap: () {
                   // Navigation to Student Signup
-                  context.pushNamed(Routes.studentSignUpName);
+                  context.pushNamed(
+                    Routes.studentSignUpName,
+                    extra: Role.student,
+                  );
                 },
               ),
 
@@ -66,7 +70,10 @@ class RoleSelectionPage extends StatelessWidget {
                 subtitle: 'Create sessions\nVerify presence\nExport records',
                 color: AppColors.accent,
                 onTap: () {
-                  context.pushNamed(Routes.studentSignUpName);
+                  context.pushNamed(
+                    Routes.studentSignUpName,
+                    extra: Role.lecturer,
+                  );
                 },
               ),
 

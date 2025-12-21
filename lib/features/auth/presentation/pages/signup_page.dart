@@ -1,15 +1,19 @@
+import 'package:attend/features/auth/presentation/widgets/signup_input_field_widget.dart';
 import 'package:attend/global/components/app_toast.dart';
 import 'package:attend/global/components/loading_overlay.dart';
 import 'package:attend/global/constants/assets.dart';
 import 'package:attend/global/constants/colors.dart';
 import 'package:attend/global/constants/spacing.dart';
 import 'package:attend/global/constants/text_styles.dart';
+import 'package:attend/global/enums/role.dart';
 import 'package:attend/global/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class SignupPage extends StatefulWidget {
-  const SignupPage({super.key});
+  final Role role;
+
+  const SignupPage({super.key, required this.role});
 
   @override
   State<SignupPage> createState() => _SignupPageState();
@@ -126,7 +130,9 @@ class _SignupPageState extends State<SignupPage> {
 
                 // Headline
                 Text(
-                  'Create Student Account',
+                  widget.role == Role.student
+                      ? 'Create Student Account'
+                      : 'Create Lecturer Account',
                   style: AppTextStyles.h1.copyWith(
                     fontSize: 32,
                     color: AppColors.primary,
@@ -146,7 +152,7 @@ class _SignupPageState extends State<SignupPage> {
                 SizedBox(height: AppSpacing.xxl),
 
                 // Email Field
-                _InputField(
+                SignupInputFieldWidget(
                   label: 'Email',
                   hint: 'name@gmail.com',
                   keyboardType: TextInputType.emailAddress,
@@ -160,12 +166,13 @@ class _SignupPageState extends State<SignupPage> {
                     }
                     return null;
                   },
+                  onChanged: (_) => _validate(),
                 ),
 
                 SizedBox(height: AppSpacing.lg),
 
                 // Password Field
-                _InputField(
+                SignupInputFieldWidget(
                   label: 'Password',
                   hint: 'Create a strong password',
                   isPassword: true,
@@ -178,12 +185,13 @@ class _SignupPageState extends State<SignupPage> {
                     return null;
                   },
                   controller: passwordController,
+                  onChanged: (_) => _validate(),
                 ),
 
                 SizedBox(height: AppSpacing.lg),
 
                 // Confirm Password
-                _InputField(
+                SignupInputFieldWidget(
                   label: 'Confirm Password',
                   hint: 'Re-type your password',
                   isPassword: true,
@@ -197,6 +205,7 @@ class _SignupPageState extends State<SignupPage> {
                     }
                     return null;
                   },
+                  onChanged: (_) => _validate(),
                 ),
 
                 SizedBox(height: AppSpacing.xxl),
@@ -267,105 +276,6 @@ class _SignupPageState extends State<SignupPage> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _InputField extends StatefulWidget {
-  final String label;
-  final String hint;
-  final TextInputType? keyboardType;
-  final bool isPassword;
-  final String? Function(String?)? validator;
-  final void Function(String)? onChanged;
-  final TextEditingController? controller;
-
-  const _InputField({
-    required this.label,
-    required this.hint,
-    this.keyboardType,
-    this.isPassword = false,
-    this.validator,
-    this.onChanged,
-    this.controller,
-  });
-
-  @override
-  State<_InputField> createState() => _InputFieldState();
-}
-
-class _InputFieldState extends State<_InputField> {
-  bool _obscure = true; // initial hidden state
-  String? _errorText;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(widget.label, style: AppTextStyles.inputLabel),
-        SizedBox(height: 8),
-        TextFormField(
-          keyboardType: widget.keyboardType,
-          obscureText: widget.isPassword ? _obscure : false,
-
-          onChanged: (value) {
-            setState(() {
-              _errorText = widget.validator?.call(value);
-            });
-            widget.onChanged?.call(value);
-            final parentState =
-                context.findAncestorStateOfType<_SignupPageState>();
-            parentState?._validate();
-          },
-          style: AppTextStyles.bodyMedium.copyWith(
-            fontSize: 16,
-            color: AppColors.textPrimary,
-          ),
-          decoration: InputDecoration(
-            hintText: widget.hint,
-            hintStyle: AppTextStyles.inputHint,
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(
-                color: AppColors.primary.withOpacity(0.3),
-                width: 2,
-              ),
-            ),
-            focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: AppColors.accent, width: 3),
-            ),
-            errorText: _errorText,
-            errorStyle: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.error,
-              fontSize: 13,
-            ),
-            focusedErrorBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: AppColors.error, width: 3),
-            ),
-            errorBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: AppColors.error, width: 2),
-            ),
-
-            contentPadding: EdgeInsets.symmetric(vertical: 12),
-
-            suffixIcon:
-                widget.isPassword
-                    ? IconButton(
-                      icon: Icon(
-                        _obscure
-                            ? Icons.visibility_off_rounded
-                            : Icons.visibility_rounded,
-                        color: AppColors.textPrimary.withOpacity(0.6),
-                      ),
-                      onPressed: () {
-                        setState(() => _obscure = !_obscure);
-                      },
-                    )
-                    : null,
-          ),
-          controller: widget.controller,
-        ),
-      ],
     );
   }
 }
