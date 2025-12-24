@@ -1,0 +1,1 @@
+enum AttendanceSimResult { success, deviceBlocked }

@@ -19,6 +19,8 @@ class AppAssets {
   // Student Auth
   static const String signupStudentHero =
       'assets/images/signup_student_hero.png';
+  static const String signupLecturerHero =
+      'assets/images/signup_lecturer_hero.png';
   static const String loginStudentHero = 'assets/images/login_student_hero.png';
 
   //  Auth

@@ -12,7 +12,7 @@ class ApiClient {
     _dio.options
       ..baseUrl = FlavorConfig.instance.baseApiUrl
       ..connectTimeout = const Duration(seconds: 20)
-      ..receiveTimeout = const Duration(seconds: 20)
+      ..receiveTimeout = const Duration(seconds: 200)
       ..responseType = ResponseType.json;
   }
 

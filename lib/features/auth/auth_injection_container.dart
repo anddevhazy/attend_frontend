@@ -23,6 +23,6 @@ Future<void> authInjectionContainer() async {
   );
 
   sl.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(client: sl.call(), tokenStorage: sl.call()),
+    () => AuthRemoteDataSourceImpl(client: sl.call()),
   );
 }

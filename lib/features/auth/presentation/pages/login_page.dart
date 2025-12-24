@@ -2,19 +2,26 @@ import 'package:attend/global/constants/assets.dart';
 import 'package:attend/global/constants/colors.dart';
 import 'package:attend/global/constants/spacing.dart';
 import 'package:attend/global/constants/text_styles.dart';
+import 'package:attend/global/enums/role.dart';
 import 'package:attend/global/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class LoginPage extends StatefulWidget {
+  final Role role;
 
+  const LoginPage({super.key, required this.role});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(
@@ -35,7 +42,9 @@ class LoginPage extends StatelessWidget {
               // Hero Illustration
               Center(
                 child: Image.asset(
-                  AppAssets.loginStudentHero,
+                  widget.role == Role.student
+                      ? AppAssets.loginStudentHero
+                      : AppAssets.loginHero,
                   height: 280,
                   fit: BoxFit.contain,
                 ),
@@ -105,8 +114,9 @@ class LoginPage extends StatelessWidget {
                 height: 58,
                 child: ElevatedButton(
                   onPressed: () {
-                    // Navigation to dashboard
-                    context.goNamed(Routes.studentHomeName);
+                    widget.role == Role.student
+                        ? context.goNamed(Routes.studentHomeName)
+                        : context.goNamed(Routes.lecturerHomeName);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
@@ -133,7 +143,7 @@ class LoginPage extends StatelessWidget {
                 child: TextButton(
                   onPressed: () {
                     // Navigation to StudentSignUpScreen
-                    context.goNamed(Routes.studentSignUpName);
+                    context.goNamed(Routes.signUpName);
                   },
                   child: RichText(
                     text: TextSpan(

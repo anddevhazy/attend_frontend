@@ -1,4 +1,3 @@
-import 'package:attend/features/auth/domain/entities/student_entity.dart';
 import 'package:attend/features/auth/domain/usecases/student_sign_up_usecase.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -10,21 +9,34 @@ class AuthCubit extends Cubit<AuthState> {
 
   AuthCubit({required this.studentSignUpUsecase}) : super(Initial());
 
-  Future<void> studentSignUp({required StudentEntity student}) async {
-    try {
-      await studentSignUpUsecase.call(student);
-      emit(Successful());
-    } catch (_) {
-      emit(Failed());
-    }
-  }
+  Future<void> studentSignUp({
+    required String email,
+    required String password,
+  }) async {
+    emit(Loading());
 
-  // Future<void> loggedOut() async{
-  //   try{
-  //     await signOutUseCase.call();
-  //     emit(UnAuthenticated());
-  //   }catch(_){
-  //     emit(UnAuthenticated());
-  //   }
-  // }
+    final result = await studentSignUpUsecase.call(email, password);
+
+    result.fold(
+      (leftSideOfStudentSignUpRemoteImpl) {
+        emit(Failed(message: leftSideOfStudentSignUpRemoteImpl.message));
+      },
+      (rightSideOfStudentSignUpRemoteImpl) {
+        final emailSent = rightSideOfStudentSignUpRemoteImpl['emailSent'];
+
+        if (emailSent) {
+          emit(
+            Successful(message: 'Account created & verification email sent'),
+          );
+        } else {
+          emit(
+            Successful(
+              message:
+                  'Account created, but sending verification email failed. Try logging in to resend.',
+            ),
+          );
+        }
+      },
+    );
+  }
 }

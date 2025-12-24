@@ -55,7 +55,4 @@ Future<void> init() async {
   // * FEATURES
 
   await authInjectionContainer();
-  // await chatInjectionContainer();
-  // await statusInjectionContainer();
-  // await callInjectionContainer();
 }

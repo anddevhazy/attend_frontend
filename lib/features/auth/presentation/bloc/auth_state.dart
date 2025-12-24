@@ -1,7 +1,8 @@
 part of 'auth_cubit.dart';
 
 abstract class AuthState extends Equatable {
-  const AuthState();
+  @override
+  List<Object?> get props => [];
 }
 
 class Initial extends AuthState {
@@ -15,11 +16,19 @@ class Loading extends AuthState {
 }
 
 class Successful extends AuthState {
+  final String message;
+
+  Successful({required this.message});
+
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [message];
 }
 
 class Failed extends AuthState {
+  final String message;
+
+  Failed({required this.message});
+
   @override
-  List<Object> get props => [];
+  List<Object> get props => [message];
 }

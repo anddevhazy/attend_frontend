@@ -54,10 +54,7 @@ class RoleSelectionPage extends StatelessWidget {
                 color: AppColors.primary,
                 onTap: () {
                   // Navigation to Student Signup
-                  context.pushNamed(
-                    Routes.studentSignUpName,
-                    extra: Role.student,
-                  );
+                  context.pushNamed(Routes.signUpName, extra: Role.student);
                 },
               ),
 
@@ -70,10 +67,7 @@ class RoleSelectionPage extends StatelessWidget {
                 subtitle: 'Create sessions\nVerify presence\nExport records',
                 color: AppColors.accent,
                 onTap: () {
-                  context.pushNamed(
-                    Routes.studentSignUpName,
-                    extra: Role.lecturer,
-                  );
+                  context.pushNamed(Routes.signUpName, extra: Role.lecturer);
                 },
               ),
 

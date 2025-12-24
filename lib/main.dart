@@ -1,9 +1,9 @@
 import 'package:attend/core/config/environment.dart';
 import 'package:attend/core/config/flavor_config.dart';
 import 'package:attend/global/routes/routes.dart';
-import 'package:attend/main_injection_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'main_injection_container.dart' as di;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,7 +13,7 @@ void main() async {
     baseApiUrl: 'https://attend-api-staging.onrender.com',
   );
 
-  await init();
+  await di.init();
 
   runApp(const MyApp());
 }

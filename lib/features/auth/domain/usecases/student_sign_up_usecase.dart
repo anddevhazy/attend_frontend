@@ -1,5 +1,4 @@
 import 'package:attend/core/error/failures.dart';
-import 'package:attend/features/auth/domain/entities/student_entity.dart';
 import 'package:attend/features/auth/domain/repositories/auth_repository.dart';
 import 'package:dartz/dartz.dart';
 
@@ -8,9 +7,10 @@ class StudentSignUpUsecase {
 
   StudentSignUpUsecase({required this.repository});
 
-  Future<Either<Failure, StudentEntity>> call(
-    StudentEntity studentEntity,
+  Future<Either<Failure, Map<String, dynamic>>> call(
+    String email,
+    String password,
   ) async {
-    return await repository.studentSignUp(studentEntity);
+    return await repository.studentSignUp(email, password);
   }
 }
