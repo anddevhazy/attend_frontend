@@ -15,6 +15,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:image/image.dart' as img;
 
 class MarkAttendanceScreen extends StatefulWidget {
   const MarkAttendanceScreen({
@@ -145,7 +146,7 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
   Future<bool> _verifyLocation() async {
     LoadingOverlay.show(context, message: "Verifying your location…");
     try {
-      await Future.delayed(const Duration(seconds: 2)); // TODO: real location
+      await Future.delayed(const Duration(seconds: 4)); // TODO: real location
       _locationVerified = true;
       return true;
     } catch (_) {
@@ -423,8 +424,24 @@ class _SelfieCaptureScreenState extends State<SelfieCaptureScreen>
     setState(() => _capturing = true);
 
     try {
-      final file = await controller.takePicture();
+      final XFile file = await controller.takePicture();
+      String finalPath = file.path;
 
+      // --- NEW: Flip the image if it's the front camera ---
+      if (_isFront) {
+        final bytes = await File(file.path).readAsBytes();
+        final decodedImage = img.decodeImage(bytes);
+
+        if (decodedImage != null) {
+          // Flip the image horizontally (left to right)
+          final flippedImage = img.flipHorizontal(decodedImage);
+
+          // Overwrite the original file with the flipped version
+          final flippedBytes = img.encodeJpg(flippedImage);
+          await File(file.path).writeAsBytes(flippedBytes);
+          finalPath = file.path;
+        }
+      }
       // Low-light check (real luminance heuristic)
       final isDark = await _isLowLight(file.path);
 
@@ -538,19 +555,39 @@ class _SelfieCaptureScreenState extends State<SelfieCaptureScreen>
       ),
       body: Stack(
         children: [
-          // Preview
           Positioned.fill(
             child:
-                _initializing
+                _initializing ||
+                        controller == null ||
+                        !controller.value.isInitialized
                     ? Center(
                       child: CircularProgressIndicator(color: AppColors.accent),
                     )
-                    : (controller == null
-                        ? const SizedBox.shrink()
-                        : _MirroredPreview(
-                          mirror: _isFront,
-                          child: CameraPreview(controller),
-                        )),
+                    : _MirroredPreview(
+                      mirror: _isFront,
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          // The sensor's aspect ratio (usually 4:3 or 16:9)
+                          // Camera plugin provides this as width/height
+                          final double previewRatio =
+                              controller.value.aspectRatio;
+
+                          // The ratio of the screen space available
+                          final double screenRatio =
+                              constraints.maxWidth / constraints.maxHeight;
+
+                          // Calculate scale to "Cover" the screen without stretching
+                          // We use the inverse because mobile sensors are rotated 90 deg
+                          double scale = 1 / (previewRatio * screenRatio);
+                          if (scale < 1) scale = 1 / scale;
+
+                          return Transform.scale(
+                            scale: scale,
+                            child: Center(child: CameraPreview(controller)),
+                          );
+                        },
+                      ),
+                    ),
           ),
 
           // Face framing overlay
@@ -665,12 +702,6 @@ class _MirroredPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // if (!mirror) return child;
-    // return Transform(
-    //   alignment: Alignment.center,
-    //   transform: Matrix4.identity()..scale(-1.0, 1.0, 1.0),
-    //   child: child,
-    // );
     return child;
   }
 }

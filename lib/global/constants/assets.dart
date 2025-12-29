@@ -68,4 +68,8 @@ class AppAssets {
       'assets/images/student_selfie_sample.png';
   static const String previousOwnerSelfieSample =
       'assets/images/previous_owner_selfie.png';
+
+  static const String moniepointAD = 'assets/images/moniepoint_ad.png';
+
+  static const String moniepointAdvert = 'assets/images/moniepoint_advert.png';
 }

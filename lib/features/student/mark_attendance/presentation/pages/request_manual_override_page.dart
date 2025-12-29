@@ -5,7 +5,6 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:attend/global/components/app_toast.dart';
-import 'package:attend/global/constants/assets.dart';
 import 'package:attend/global/constants/colors.dart';
 import 'package:attend/global/constants/spacing.dart';
 import 'package:attend/global/constants/text_styles.dart';
@@ -14,14 +13,15 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:image/image.dart' as img;
 
 class RequestManualOverridePage extends StatefulWidget {
   const RequestManualOverridePage({
     super.key,
     this.sessionCode = 'CSC 301',
     this.sessionTitle = 'Data Structures & Algorithms',
-    this.lecturerName = 'Dr. Adebayo',
-    this.venue = 'LH 201',
+    this.lecturerName = 'Dr. Okafor',
+    this.venue = '1k Cap',
   });
 
   final String sessionCode;
@@ -154,7 +154,10 @@ class _RequestManualOverridePageState extends State<RequestManualOverridePage> {
     if (!mounted) return;
 
     // Go back to homepage and clear this flow
-    context.goNamed(Routes.studentHomeName);
+    context.goNamed(
+      Routes.studentHomeName,
+      queryParameters: {'status': 'pending'},
+    );
   }
 
   @override
@@ -604,6 +607,19 @@ class _OverrideSelfieCaptureScreenState
 
     try {
       final file = await controller.takePicture();
+      String finalPath = file.path;
+
+      // ✅ NEW: Flip the image horizontally if using the front camera
+      if (_isFront) {
+        final bytes = await File(file.path).readAsBytes();
+        final decodedImage = img.decodeImage(bytes);
+
+        if (decodedImage != null) {
+          final flippedImage = img.flipHorizontal(decodedImage);
+          final flippedBytes = img.encodeJpg(flippedImage);
+          await File(file.path).writeAsBytes(flippedBytes);
+        }
+      }
 
       final isDark = await _isLowLight(file.path);
       if (!mounted) return;
@@ -710,18 +726,32 @@ class _OverrideSelfieCaptureScreenState
         children: [
           Positioned.fill(
             child:
-                _initializing
-                    ? Center(
+                _initializing ||
+                        controller == null ||
+                        !controller.value.isInitialized
+                    ? const Center(
                       child: CircularProgressIndicator(color: AppColors.accent),
                     )
-                    : (controller == null
-                        ? const SizedBox.shrink()
-                        : _MirroredPreview(
-                          mirror: _isFront,
-                          child: CameraPreview(controller),
-                        )),
-          ),
+                    : _MirroredPreview(
+                      mirror: _isFront,
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          // Calculate scale to prevent stretching
+                          final double previewRatio =
+                              controller.value.aspectRatio;
+                          final double screenRatio =
+                              constraints.maxWidth / constraints.maxHeight;
+                          double scale = 1 / (previewRatio * screenRatio);
+                          if (scale < 1) scale = 1 / scale;
 
+                          return Transform.scale(
+                            scale: scale,
+                            child: Center(child: CameraPreview(controller)),
+                          );
+                        },
+                      ),
+                    ),
+          ),
           Positioned.fill(
             child: IgnorePointer(
               child: CustomPaint(painter: _FaceGuidePainter()),

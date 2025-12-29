@@ -74,11 +74,8 @@ class Routes {
   static final GoRouter router = GoRouter(
     navigatorKey: rootNavigatorKey,
 
-    initialLocation: lecturerHistoryPath,
-    // initialLocation: reviewOverrideRequestPath,
+    initialLocation: splashPath,
 
-    // initialLocation: studentHomePath,
-    // initialLocation: requestManualOverridePath,
     routes: [
       GoRoute(
         path: splashPath,
@@ -87,7 +84,7 @@ class Routes {
       ),
       GoRoute(
         path: lecturerHistoryPath,
-        name: lecturerHistoryPath,
+        name: lecturerHistoryName,
         builder: (context, state) => const LecturerHistoryGradingPage(),
       ),
       GoRoute(
@@ -140,9 +137,12 @@ class Routes {
         },
       ),
       GoRoute(
-        path: studentHomePath,
-        name: studentHomeName,
-        builder: (context, state) => const StudentHomePage(),
+        path: Routes.studentHomePath,
+        name: Routes.studentHomeName,
+        builder: (context, state) {
+          final status = state.uri.queryParameters['status'];
+          return StudentHomePage(initialStatus: status);
+        },
       ),
       GoRoute(
         path: activeSessionPath,
@@ -171,10 +171,14 @@ class Routes {
         name: requestManualOverrideName,
         builder: (context, state) => const RequestManualOverridePage(),
       ),
+      // In your router file
       GoRoute(
-        path: lecturerHomePath,
-        name: lecturerHomeName,
-        builder: (context, state) => const LecturerHomePage(),
+        path: Routes.lecturerHomePath,
+        name: Routes.lecturerHomeName,
+        builder: (context, state) {
+          final status = state.uri.queryParameters['status'];
+          return LecturerHomePage(initialStatus: status);
+        },
       ),
       GoRoute(
         path: createSessionPath,

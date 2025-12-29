@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:attend/global/constants/assets.dart';
 import 'package:attend/global/constants/colors.dart';
 import 'package:attend/global/constants/spacing.dart';
@@ -6,35 +8,62 @@ import 'package:attend/global/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class LecturerHomePage extends StatelessWidget {
-  const LecturerHomePage({super.key});
+class LecturerHomePage extends StatefulWidget {
+  final String? initialStatus;
+  const LecturerHomePage({super.key, this.initialStatus});
 
+  @override
+  State<LecturerHomePage> createState() => _LecturerHomePageState();
+}
+
+class _LecturerHomePageState extends State<LecturerHomePage> {
   // Toggle to test both states
-  final bool hasActiveSession = true;
+  bool _hasActiveSession = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialStatus == 'active') {
+      _hasActiveSession = true;
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant LecturerHomePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // This triggers when you navigate back with new query parameters
+    if (widget.initialStatus == 'active' && !_hasActiveSession) {
+      setState(() {
+        _hasActiveSession = true;
+      });
+    } else if (widget.initialStatus != 'active' && _hasActiveSession) {
+      // Optional: Reset if status is removed, depends on your desired flow
+      // setState(() => _hasActiveSession = false);
+    }
+  }
+
+  // 3. Define the demo data
+  final _demoSession = const _SessionUiModel(
+    codeAndVenue: 'CSC 301 • 1k Cap',
+    title: 'Data Structures & Algorithms',
+    endsIn: '15:00',
+    marked: 0,
+    manualRequests: 0,
+    isLive: true,
+  );
+  // _SessionUiModel(
+  //   codeAndVenue: 'CSC 401 • LH 201',
+  //   title: 'Operating Systems',
+  //   endsIn: '18:02',
+  //   marked: 31,
+  //   manualRequests: 0,
+  //   isLive: true,
+  // ),
 
   @override
   Widget build(BuildContext context) {
-    final sessions =
-        hasActiveSession
-            ? <_SessionUiModel>[
-              _SessionUiModel(
-                codeAndVenue: 'CSC 301 • 1k Cap',
-                title: 'Data Structures & Algorithms',
-                endsIn: '42:15',
-                marked: 47,
-                manualRequests: 2,
-                isLive: true,
-              ),
-              // _SessionUiModel(
-              //   codeAndVenue: 'CSC 401 • LH 201',
-              //   title: 'Operating Systems',
-              //   endsIn: '18:02',
-              //   marked: 31,
-              //   manualRequests: 0,
-              //   isLive: true,
-              // ),
-            ]
-            : <_SessionUiModel>[];
+    final sessions = _hasActiveSession ? [_demoSession] : <_SessionUiModel>[];
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -44,11 +73,16 @@ class LecturerHomePage extends StatelessWidget {
         initials: 'DO',
         greeting: 'Welcome back sir',
         name: 'Dr. Okafor',
+        // 4. Secret Trigger Logic
+        onNameTap: () {
+          setState(() {
+            _hasActiveSession = !_hasActiveSession;
+          });
+        },
         onHistoryTap: () {
-          // TODO: context.goNamed(Routes.pastSessionsName);
+          context.pushNamed(Routes.lecturerHistoryName);
         },
       ),
-
       body: CustomScrollView(
         slivers: [
           const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.sm)),
@@ -89,7 +123,7 @@ class LecturerHomePage extends StatelessWidget {
           child: SizedBox(
             height: 56,
             child: ElevatedButton.icon(
-              onPressed: () => context.goNamed(Routes.createSessionName),
+              onPressed: () => context.pushNamed(Routes.createSessionName),
               icon: const Icon(Icons.play_arrow_rounded, size: 26),
               label: Text(
                 'Start Session',
@@ -119,12 +153,14 @@ class _LecturerAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String greeting;
   final String name;
   final VoidCallback onHistoryTap;
+  final VoidCallback onNameTap; // Add this
 
   const _LecturerAppBar({
     required this.initials,
     required this.greeting,
     required this.name,
     required this.onHistoryTap,
+    required this.onNameTap, // Add this
   });
 
   @override
@@ -172,12 +208,15 @@ class _LecturerAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  name,
-                  style: AppTextStyles.h2.copyWith(
-                    fontSize: 20,
-                    color: AppColors.primary,
-                    height: 1.0,
+                GestureDetector(
+                  onTap: onNameTap,
+                  behavior: HitTestBehavior.opaque,
+                  child: Text(
+                    name,
+                    style: AppTextStyles.h2.copyWith(
+                      fontSize: 20,
+                      color: AppColors.primary,
+                    ),
                   ),
                 ),
               ],
@@ -222,10 +261,60 @@ class _SessionUiModel {
   });
 }
 
-class _SessionCard extends StatelessWidget {
+class _SessionCard extends StatefulWidget {
   final _SessionUiModel model;
 
   const _SessionCard({required this.model});
+
+  @override
+  State<_SessionCard> createState() => _SessionCardState();
+}
+
+class _SessionCardState extends State<_SessionCard> {
+  late Duration _remainingTime;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _remainingTime = _parseTimeString(widget.model.endsIn);
+    _startTimer();
+  }
+
+  Duration _parseTimeString(String timeString) {
+    final parts = timeString.split(':');
+    if (parts.length == 2) {
+      final minutes = int.tryParse(parts[0]) ?? 0;
+      final seconds = int.tryParse(parts[1]) ?? 0;
+      return Duration(minutes: minutes, seconds: seconds);
+    }
+    return Duration.zero;
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_remainingTime.inSeconds > 0) {
+        setState(() {
+          _remainingTime = _remainingTime - const Duration(seconds: 1);
+        });
+      } else {
+        timer.cancel();
+        // Optionally handle session expiry
+      }
+    });
+  }
+
+  String _formatDuration(Duration duration) {
+    final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -255,7 +344,7 @@ class _SessionCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      model.codeAndVenue,
+                      widget.model.codeAndVenue,
                       style: AppTextStyles.h2.copyWith(
                         fontSize: 20,
                         color: AppColors.primary,
@@ -264,7 +353,7 @@ class _SessionCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      model.title,
+                      widget.model.title,
                       style: AppTextStyles.bodyLarge.copyWith(
                         fontSize: 14.5,
                         color: AppColors.textPrimary.withOpacity(0.85),
@@ -275,7 +364,10 @@ class _SessionCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppSpacing.md),
-              _LivePill(endsIn: model.endsIn, isLive: model.isLive),
+              _LivePill(
+                endsIn: _formatDuration(_remainingTime),
+                isLive: widget.model.isLive,
+              ),
             ],
           ),
 
@@ -287,7 +379,7 @@ class _SessionCard extends StatelessWidget {
               Expanded(
                 child: _StatTile(
                   label: 'Marked',
-                  count: '${model.marked}',
+                  count: '${widget.model.marked}',
                   color: AppColors.success,
                 ),
               ),
@@ -295,7 +387,7 @@ class _SessionCard extends StatelessWidget {
               Expanded(
                 child: _StatTile(
                   label: 'Denied',
-                  count: '${model.manualRequests}',
+                  count: '${widget.model.manualRequests}',
                   color: AppColors.accent,
                 ),
               ),

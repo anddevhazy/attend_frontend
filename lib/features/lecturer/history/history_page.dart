@@ -1,9 +1,15 @@
+import 'dart:io';
 import 'dart:math';
 
+import 'package:attend/global/components/app_toast.dart';
 import 'package:attend/global/constants/colors.dart';
 import 'package:attend/global/constants/spacing.dart';
 import 'package:attend/global/constants/text_styles.dart';
+import 'package:excel/excel.dart' hide Border;
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class LecturerHistoryGradingPage extends StatefulWidget {
   const LecturerHistoryGradingPage({super.key});
@@ -13,8 +19,8 @@ class LecturerHistoryGradingPage extends StatefulWidget {
       _LecturerHistoryGradingPageState();
 }
 
-class _LecturerHistoryGradingPageState
-    extends State<LecturerHistoryGradingPage> {
+class _LecturerHistoryGradingPageState extends State<LecturerHistoryGradingPage>
+    with SingleTickerProviderStateMixin {
   // ---- Demo data (replace with API/state later) ----
   final List<_CourseUi> _courses = const [
     _CourseUi(code: "CSC 301", title: "Data Structures & Algorithms"),
@@ -25,8 +31,22 @@ class _LecturerHistoryGradingPageState
   late _CourseUi _selectedCourse = _courses.first;
 
   // Grading config
-  int _classesHeld = 12; // lecturer inputs
-  int _attendanceMarks = 10; // lecturer inputs
+  int _classesHeld = 12;
+  int _attendanceMarks = 10;
+
+  late final TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,10 +61,10 @@ class _LecturerHistoryGradingPageState
         scrolledUnderElevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded, color: AppColors.primary),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
         ),
         title: Text(
-          "History & grading",
+          "History & Grading",
           style: AppTextStyles.h2.copyWith(
             fontSize: 20,
             color: AppColors.primary,
@@ -59,202 +79,111 @@ class _LecturerHistoryGradingPageState
           ),
         ),
       ),
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(child: const SizedBox(height: AppSpacing.lg)),
+      body: Column(
+        children: [
+          const SizedBox(height: AppSpacing.sm),
 
-          // Header controls
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-            sliver: SliverToBoxAdapter(
-              child: Column(
-                children: [
-                  _CoursePicker(
-                    courses: _courses,
-                    selected: _selectedCourse,
-                    onChanged: (c) => setState(() => _selectedCourse = c),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _MiniStat(
-                          label: "Sessions",
-                          value: "$totalSessions",
-                          icon: Icons.calendar_month_rounded,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          SliverToBoxAdapter(child: const SizedBox(height: AppSpacing.lg)),
-
-          // Grading config card
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-            sliver: SliverToBoxAdapter(
-              child: _Card(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+          // Header controls (shared across tabs)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+            child: Column(
+              children: [
+                _CoursePicker(
+                  courses: _courses,
+                  selected: _selectedCourse,
+                  onChanged: (c) => setState(() => _selectedCourse = c),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Row(
                   children: [
-                    Row(
-                      children: [
-                        _SectionIcon(icon: Icons.auto_graph_rounded),
-                        const SizedBox(width: AppSpacing.md),
-                        Expanded(
-                          child: Text(
-                            "Attendance grading",
-                            style: AppTextStyles.bodyLarge.copyWith(
-                              fontWeight: FontWeight.w900,
-                              color: AppColors.textPrimary,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      "Set how many classes you’ll hold and how many marks attendance carries. We’ll compute each student’s score automatically.",
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.textPrimary.withOpacity(0.75),
-                        fontWeight: FontWeight.w600,
-                        height: 1.35,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _NumberField(
-                            label: "Classes held",
-                            value: _classesHeld,
-                            min: 1,
-                            max: 40,
-                            onChanged: (v) => setState(() => _classesHeld = v),
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.md),
-                        Expanded(
-                          child: _NumberField(
-                            label: "Attendance marks",
-                            value: _attendanceMarks,
-                            min: 1,
-                            max: 30,
-                            onChanged:
-                                (v) => setState(() => _attendanceMarks = v),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: AppSpacing.lg),
-                    Container(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      decoration: BoxDecoration(
-                        color: AppColors.accent.withOpacity(0.08),
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(
-                          color: AppColors.accent.withOpacity(0.16),
-                        ),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(
-                            Icons.info_outline_rounded,
-                            color: AppColors.accent,
-                            size: 20,
-                          ),
-                          const SizedBox(width: AppSpacing.md),
-                          Expanded(
-                            child: Text(
-                              "Example: 8 / $_classesHeld classes ⇒ ${_score(8).toStringAsFixed(1)} / $_attendanceMarks marks",
-                              style: AppTextStyles.bodyMedium.copyWith(
-                                color: AppColors.textPrimary.withOpacity(0.85),
-                                fontWeight: FontWeight.w700,
-                                height: 1.35,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: AppSpacing.lg),
-
-                    // Export placeholder
-                    SizedBox(
-                      height: 52,
-                      child: OutlinedButton.icon(
-                        onPressed: () {
-                          // TODO: export CSV/PDF
-                        },
-                        icon: const Icon(Icons.download_rounded),
-                        label: Text(
-                          "Export report (CSV)",
-                          style: AppTextStyles.bodyLarge.copyWith(
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.primary,
-                            fontSize: 15.5,
-                          ),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                            color: AppColors.primary.withOpacity(0.18),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                        ),
+                    Expanded(
+                      child: _MiniStat(
+                        label: "Sessions",
+                        value: "$totalSessions",
+                        icon: Icons.calendar_month_rounded,
                       ),
                     ),
                   ],
                 ),
-              ),
+              ],
             ),
           ),
 
-          SliverToBoxAdapter(child: const SizedBox(height: AppSpacing.lg)),
+          const SizedBox(height: AppSpacing.lg),
 
-          // Session history list
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-            sliver: SliverToBoxAdapter(
-              child: Text(
-                "Session history",
-                style: AppTextStyles.bodyLarge.copyWith(
+          // Tabs
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: AppColors.primary.withOpacity(0.06)),
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 18,
+                    offset: const Offset(0, 10),
+                    color: AppColors.primary.withOpacity(0.04),
+                  ),
+                ],
+              ),
+              child: TabBar(
+                controller: _tabController,
+                indicatorSize: TabBarIndicatorSize.tab,
+                dividerColor: Colors.transparent,
+                labelColor: AppColors.white,
+                unselectedLabelColor: AppColors.textPrimary.withOpacity(0.72),
+                labelStyle: AppTextStyles.bodyMedium.copyWith(
                   fontWeight: FontWeight.w900,
-                  color: AppColors.textPrimary,
-                  fontSize: 16,
                 ),
+                indicator: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                tabs: const [Tab(text: "History"), Tab(text: "Grading")],
               ),
             ),
           ),
 
-          SliverToBoxAdapter(child: const SizedBox(height: AppSpacing.md)),
+          const SizedBox(height: AppSpacing.sm),
 
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.xl,
-              0,
-              AppSpacing.xl,
-              AppSpacing.huge,
-            ),
-            sliver: SliverList.separated(
-              itemCount: sessions.length,
-              separatorBuilder:
-                  (_, __) => const SizedBox(height: AppSpacing.md),
-              itemBuilder: (context, i) {
-                final s = sessions[i];
-                return _SessionCard(session: s);
-              },
+          // Tab content
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _HistoryTab(sessions: sessions),
+                _GradingTab(
+                  classesHeld: _classesHeld,
+                  attendanceMarks: _attendanceMarks,
+                  onEditClassesHeld: () async {
+                    final v = await _pickNumber(
+                      title: "Classes held",
+                      subtitle:
+                          "How many classes will you hold for this course?",
+                      initial: _classesHeld,
+                      min: 1,
+                      max: 40,
+                    );
+                    if (!mounted || v == null) return;
+                    setState(() => _classesHeld = v);
+                  },
+                  onEditAttendanceMarks: () async {
+                    final v = await _pickNumber(
+                      title: "Attendance marks",
+                      subtitle: "How many marks should attendance carry?",
+                      initial: _attendanceMarks,
+                      min: 1,
+                      max: 30,
+                    );
+                    if (!mounted || v == null) return;
+                    setState(() => _attendanceMarks = v);
+                  },
+                  scoreExample: (attended) => _score(attended),
+                  onExport: _simulateExport,
+                ),
+              ],
             ),
           ),
         ],
@@ -268,6 +197,285 @@ class _LecturerHistoryGradingPageState
     return (ratio * _attendanceMarks).clamp(0, _attendanceMarks).toDouble();
   }
 
+  Future<int?> _pickNumber({
+    required String title,
+    required String subtitle,
+    required int initial,
+    required int min,
+    required int max,
+  }) async {
+    int temp = initial;
+
+    return showModalBottomSheet<int>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isDismissible: true,
+      builder: (_) {
+        return Container(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.xl,
+            AppSpacing.lg,
+            AppSpacing.xl,
+            AppSpacing.xl,
+          ),
+          decoration: const BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: StatefulBuilder(
+            builder: (ctx, setSheet) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 44,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: AppColors.textPrimary.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Text(
+                    title,
+                    style: AppTextStyles.h2.copyWith(
+                      fontSize: 18,
+                      color: AppColors.primary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    subtitle,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textPrimary.withOpacity(0.75),
+                      fontWeight: FontWeight.w700,
+                      height: 1.35,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    decoration: BoxDecoration(
+                      color: AppColors.background,
+                      borderRadius: BorderRadius.circular(22),
+                      border: Border.all(
+                        color: AppColors.primary.withOpacity(0.08),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _StepperBtn(
+                          icon: Icons.remove_rounded,
+                          onTap: () {
+                            if (temp > min) {
+                              setSheet(() => temp--);
+                            }
+                          },
+                        ),
+                        const SizedBox(width: 18),
+                        Text(
+                          "$temp",
+                          style: AppTextStyles.h2.copyWith(
+                            fontSize: 28,
+                            color: AppColors.primary,
+                            height: 1.0,
+                          ),
+                        ),
+                        const SizedBox(width: 18),
+                        _StepperBtn(
+                          icon: Icons.add_rounded,
+                          onTap: () {
+                            if (temp < max) {
+                              setSheet(() => temp++);
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: AppSpacing.lg),
+
+                  SizedBox(
+                    height: 56,
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(ctx, temp),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: AppColors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                      ),
+                      child: Text(
+                        "Save",
+                        style: AppTextStyles.bodyLarge.copyWith(
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  SizedBox(
+                    height: 56,
+                    width: double.infinity,
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(
+                          color: AppColors.primary.withOpacity(0.18),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                      ),
+                      child: Text(
+                        "Cancel",
+                        style: AppTextStyles.bodyLarge.copyWith(
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.primary,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _simulateExport() async {
+    const students = 84;
+
+    final classesHeld = _classesHeld;
+    final attendanceMarks = _attendanceMarks;
+    final rng = Random(42);
+
+    String matricFor(int i) => "2020${(1683 + i).toString()}";
+
+    final excel = Excel.createExcel();
+    final sheet = excel['Sheet1'];
+
+    // Header row
+    sheet.cell(CellIndex.indexByString("A1")).value = TextCellValue(
+      "Matric No.",
+    );
+    sheet.cell(CellIndex.indexByString("B1")).value = TextCellValue(
+      "Score (𝑥/12)  ",
+    );
+    sheet.cell(CellIndex.indexByString("C1")).value = TextCellValue(
+      "70% Attendance  ",
+    );
+
+    // Center style for both columns
+    final centerStyle = CellStyle(
+      horizontalAlign: HorizontalAlign.Center,
+      verticalAlign: VerticalAlign.Center,
+      bold: false,
+    );
+
+    final headerStyle = CellStyle(
+      horizontalAlign: HorizontalAlign.Center,
+      verticalAlign: VerticalAlign.Center,
+      bold: true,
+    );
+
+    sheet.cell(CellIndex.indexByString("A1")).cellStyle = headerStyle;
+    sheet.cell(CellIndex.indexByString("B1")).cellStyle = headerStyle;
+    sheet.cell(CellIndex.indexByString("C1")).cellStyle = headerStyle;
+
+    // Data rows
+    for (int i = 1; i <= students; i++) {
+      final attended = max(
+        0,
+        min(classesHeld, 2 + rng.nextInt(max(1, classesHeld - 1))),
+      );
+      final score =
+          ((attended / max(1, classesHeld)) * attendanceMarks)
+              .clamp(0, attendanceMarks)
+              .round();
+
+      // Calculate if score is at least 70% of total attainable marks
+      final seventyPercentThreshold = attendanceMarks * 0.7;
+      final meetsThreshold = score >= seventyPercentThreshold;
+
+      final row = i + 1; // since row 1 is header
+
+      final a = sheet.cell(
+        CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: row - 1),
+      );
+      final b = sheet.cell(
+        CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: row - 1),
+      );
+      final c = sheet.cell(
+        CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: row - 1),
+      );
+
+      a.value = TextCellValue(matricFor(i));
+      b.value = TextCellValue(score.toString());
+      c.value = TextCellValue(meetsThreshold ? "✅  " : "❌  ");
+
+      a.cellStyle = centerStyle;
+      b.cellStyle = centerStyle;
+      c.cellStyle = centerStyle;
+    }
+
+    // Optional: set column widths
+    sheet.setColumnWidth(0, 20);
+    sheet.setColumnWidth(1, 30);
+    sheet.setColumnWidth(2, 25);
+
+    final bytes = excel.encode();
+    if (bytes == null) return;
+
+    final dir = await getTemporaryDirectory();
+    final safeCourse = _selectedCourse.code.replaceAll(" ", "_");
+    final now = DateTime.now();
+    final dateStr =
+        "${now.day.toString().padLeft(2, '0')}-${now.month.toString().padLeft(2, '0')}-${now.year}";
+    final timeStr =
+        "${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}";
+
+    final fileName =
+        "${safeCourse}_attendance_CA_1stSemester_2025-2026_${dateStr}_$timeStr.xlsx";
+    final file = File("${dir.path}/$fileName");
+
+    await file.writeAsBytes(bytes, flush: true);
+    if (!mounted) return;
+
+    await Share.shareXFiles(
+      [
+        XFile(
+          file.path,
+          mimeType:
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        ),
+      ],
+      subject: "${_selectedCourse.code} Attendance CA",
+      text: "Attendance CA export for ${_selectedCourse.code}.",
+    );
+
+    if (!mounted) return;
+
+    AppToast.show(
+      context: context,
+      message: "${_selectedCourse.code} CA exported",
+      type: ToastType.success,
+    );
+  }
+
   List<_SessionUi> _demoSessionsFor(String code) {
     final all = <_SessionUi>[
       _SessionUi(
@@ -277,6 +485,46 @@ class _LecturerHistoryGradingPageState
         venue: "LH 201",
         present: 47,
         denied: 2,
+      ),
+      _SessionUi(
+        courseCode: "CSC 301",
+        dateLabel: "Wed • Nov 12",
+        timeLabel: "10:00 – 12:00",
+        venue: "LH 201",
+        present: 45,
+        denied: 1,
+      ),
+      _SessionUi(
+        courseCode: "CSC 301",
+        dateLabel: "Mon • Nov 17",
+        timeLabel: "10:00 – 12:00",
+        venue: "LH 201",
+        present: 50,
+        denied: 0,
+      ),
+      _SessionUi(
+        courseCode: "CSC 301",
+        dateLabel: "Mon • Nov 10",
+        timeLabel: "10:00 – 12:00",
+        venue: "LH 201",
+        present: 47,
+        denied: 2,
+      ),
+      _SessionUi(
+        courseCode: "CSC 301",
+        dateLabel: "Wed • Nov 12",
+        timeLabel: "10:00 – 12:00",
+        venue: "LH 201",
+        present: 45,
+        denied: 1,
+      ),
+      _SessionUi(
+        courseCode: "CSC 301",
+        dateLabel: "Mon • Nov 17",
+        timeLabel: "10:00 – 12:00",
+        venue: "LH 201",
+        present: 50,
+        denied: 0,
       ),
       _SessionUi(
         courseCode: "CSC 301",
@@ -312,10 +560,171 @@ class _LecturerHistoryGradingPageState
       ),
     ];
 
-    // simple filter simulation
-    var list = all.where((s) => s.courseCode == code).toList();
+    return all.where((s) => s.courseCode == code).toList();
+  }
+}
 
-    return list;
+// ---------------- Tabs ----------------
+
+class _HistoryTab extends StatelessWidget {
+  final List<_SessionUi> sessions;
+  const _HistoryTab({required this.sessions});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.md,
+            0,
+            AppSpacing.sm,
+            AppSpacing.huge,
+          ),
+          sliver: SliverList.separated(
+            itemCount: sessions.length,
+            separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
+            itemBuilder: (context, i) => _SessionCard(session: sessions[i]),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _GradingTab extends StatelessWidget {
+  final int classesHeld;
+  final int attendanceMarks;
+  final VoidCallback onEditClassesHeld;
+  final VoidCallback onEditAttendanceMarks;
+  final double Function(int attended) scoreExample;
+  final Future<void> Function() onExport;
+
+  const _GradingTab({
+    required this.classesHeld,
+    required this.attendanceMarks,
+    required this.onEditClassesHeld,
+    required this.onEditAttendanceMarks,
+    required this.scoreExample,
+    required this.onExport,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.md,
+            0,
+            AppSpacing.sm,
+            AppSpacing.huge,
+          ),
+          sliver: SliverToBoxAdapter(
+            child: _Card(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      _SectionIcon(icon: Icons.auto_graph_rounded),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: Text(
+                          "Attendance grading",
+                          style: AppTextStyles.bodyLarge.copyWith(
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.textPrimary,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    "Set how many marks attendance carries for this semester. We will compute each student’s score automatically.",
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textPrimary.withOpacity(0.75),
+                      fontWeight: FontWeight.w600,
+                      height: 1.35,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  _EditStatTile(
+                    value: "$attendanceMarks marks",
+                    hint: "Tap to edit",
+                    icon: Icons.workspace_premium_rounded,
+                    onTap: onEditAttendanceMarks,
+                  ),
+
+                  const SizedBox(height: AppSpacing.lg),
+
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      color: AppColors.accent.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: AppColors.accent.withOpacity(0.16),
+                      ),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.info_outline_rounded,
+                          color: AppColors.accent,
+                          size: 20,
+                        ),
+                        const SizedBox(width: AppSpacing.md),
+                        Expanded(
+                          child: Text(
+                            "E.g: If a student attended 8 out of 10 classes when attendance carries 12 marks for the semester, his Attendance CA score will be           10 / 12 marks.",
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.textPrimary.withOpacity(0.85),
+                              fontWeight: FontWeight.w700,
+                              height: 1.35,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: AppSpacing.lg),
+
+                  SizedBox(
+                    height: 52,
+                    child: OutlinedButton.icon(
+                      onPressed: onExport,
+                      icon: const Icon(Icons.download_rounded),
+                      label: Text(
+                        "Download Continuous Assessment",
+                        style: AppTextStyles.bodyLarge.copyWith(
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.primary,
+                          fontSize: 15.5,
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(
+                          color: AppColors.primary.withOpacity(0.18),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
 
@@ -461,6 +870,113 @@ class _MiniStat extends StatelessWidget {
   }
 }
 
+class _EditStatTile extends StatelessWidget {
+  final String value;
+  final String hint;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _EditStatTile({
+    required this.value,
+    required this.hint,
+    required this.icon,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.background,
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: AppColors.primary.withOpacity(0.08)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.06),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: AppColors.primary.withOpacity(0.08),
+                  ),
+                ),
+                child: Icon(icon, color: AppColors.primary, size: 20),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      value,
+                      style: AppTextStyles.h2.copyWith(
+                        fontSize: 20,
+                        color: AppColors.primary,
+                        height: 1.0,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                hint,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textPrimary.withOpacity(0.55),
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.textPrimary.withOpacity(0.55),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StepperBtn extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _StepperBtn({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.white,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Container(
+          width: 52,
+          height: 52,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.primary.withOpacity(0.10)),
+          ),
+          child: Icon(icon, color: AppColors.primary),
+        ),
+      ),
+    );
+  }
+}
+
 class _SessionCard extends StatelessWidget {
   final _SessionUi session;
   const _SessionCard({required this.session});
@@ -474,7 +990,6 @@ class _SessionCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Header row
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -526,9 +1041,7 @@ class _SessionCard extends StatelessWidget {
               ),
             ],
           ),
-
-          const SizedBox(height: AppSpacing.lg),
-
+          const SizedBox(height: AppSpacing.md),
           Row(
             children: [
               Expanded(
@@ -539,7 +1052,6 @@ class _SessionCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppSpacing.md),
-
               Expanded(
                 child: _TinyStat(
                   label: "Denied",
@@ -606,7 +1118,7 @@ class _Card extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(24),
@@ -639,91 +1151,6 @@ class _SectionIcon extends StatelessWidget {
         border: Border.all(color: AppColors.primary.withOpacity(0.08)),
       ),
       child: Icon(icon, color: AppColors.primary, size: 22),
-    );
-  }
-}
-
-class _NumberField extends StatelessWidget {
-  final String label;
-  final int value;
-  final int min;
-  final int max;
-  final ValueChanged<int> onChanged;
-
-  const _NumberField({
-    required this.label,
-    required this.value,
-    required this.min,
-    required this.max,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.primary.withOpacity(0.08)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textPrimary.withOpacity(0.70),
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              _IconBtn(icon: Icons.remove_rounded, onTap: () => onChanged(max)),
-              const SizedBox(width: 12),
-              Text(
-                "$value",
-                style: AppTextStyles.h2.copyWith(
-                  fontSize: 22,
-                  color: AppColors.primary,
-                  height: 1.0,
-                ),
-              ),
-              const SizedBox(width: 12),
-              _IconBtn(icon: Icons.add_rounded, onTap: () => onChanged(min)),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _IconBtn extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const _IconBtn({required this.icon, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.white,
-      borderRadius: BorderRadius.circular(14),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(14),
-        onTap: onTap,
-        child: Container(
-          width: 38,
-          height: 38,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.primary.withOpacity(0.10)),
-          ),
-          child: Icon(icon, color: AppColors.primary),
-        ),
-      ),
     );
   }
 }

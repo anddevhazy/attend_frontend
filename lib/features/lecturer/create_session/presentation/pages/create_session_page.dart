@@ -2,7 +2,9 @@ import 'package:attend/global/constants/assets.dart';
 import 'package:attend/global/constants/colors.dart';
 import 'package:attend/global/constants/spacing.dart';
 import 'package:attend/global/constants/text_styles.dart';
+import 'package:attend/global/routes/routes.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class CreateSessionPage extends StatefulWidget {
   const CreateSessionPage({super.key});
@@ -52,6 +54,7 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
     'COLNAS Auditorium',
     'COLENG 001',
     'Main Library Reading Room',
+    '1k Cap',
   ];
 
   bool get canStart => selectedCourse != null && selectedLocation != null;
@@ -71,7 +74,7 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
             color: AppColors.primary,
             size: 28,
           ),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
         ),
         title: Text(
           'Create Session',
@@ -279,7 +282,10 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
               onPressed:
                   canStart
                       ? () {
-                        // TODO: create session and navigate to live view
+                        context.goNamed(
+                          Routes.lecturerHomeName,
+                          queryParameters: {'status': 'active'},
+                        );
                       }
                       : null,
               style: ElevatedButton.styleFrom(
