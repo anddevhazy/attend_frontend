@@ -1,23 +1,8 @@
 import 'package:attend/core/utils/app_logger.dart';
-import 'package:attend/storage/token_storage_provider.dart';
 import 'package:dio/dio.dart';
 
 class AuthInterceptor extends Interceptor {
-  final TokenStorageProvider tokenStorage;
-
-  AuthInterceptor(this.tokenStorage);
-
-  @override
-  void onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) async {
-    final token = await tokenStorage.getAccessToken();
-    if (token != null && token.isNotEmpty) {
-      options.headers['Authorization'] = 'Bearer $token';
-    }
-    super.onRequest(options, handler);
-  }
+  AuthInterceptor();
 }
 
 class LoggingInterceptor extends Interceptor {
