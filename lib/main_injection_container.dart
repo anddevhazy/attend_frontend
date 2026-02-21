@@ -5,18 +5,9 @@ import 'package:dio/dio.dart';
 import 'core/network/api_client.dart';
 import 'core/network/api_interceptors.dart';
 import 'core/network/network_info.dart';
-import 'core/utils/app_logger.dart';
 
 Future<void> init() async {
   // * CORE
-
-  // Logger
-  sl.registerLazySingleton<AppLogger>(() => AppLoggerImpl());
-
-  //   note for myself: the above is the same thing as ;
-  //   sl.registerLazySingleton<AppLogger>(() {
-  //    return AppLoggerImpl();
-  //   });
 
   // Connectivity & Network info
   sl.registerLazySingleton<Connectivity>(() => Connectivity());
@@ -42,10 +33,7 @@ Future<void> init() async {
   sl.registerLazySingleton<ApiClient>(() {
     final dio = sl<Dio>();
 
-    dio.interceptors.addAll([
-      AuthInterceptor(),
-      LoggingInterceptor(sl<AppLogger>()),
-    ]);
+    dio.interceptors.addAll([AuthInterceptor()]);
 
     return ApiClient(dio, sl<NetworkInfo>());
   });

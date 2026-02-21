@@ -11,22 +11,21 @@ class ApiException implements Exception {
 }
 
 class NetworkException extends ApiException {
-  NetworkException({super.message = 'No internet connection'});
+  NetworkException({required super.message});
 }
 
 class TimeoutException extends ApiException {
-  TimeoutException({super.message = 'Request timeout'});
+  TimeoutException({required super.message});
 }
 
 class UnauthorizedException extends ApiException {
-  UnauthorizedException({super.message = 'Unauthorized'})
-    : super(statusCode: 401);
+  UnauthorizedException({required super.message, required super.statusCode});
 }
 
 class ServerException extends ApiException {
-  ServerException({super.message = 'Server error', super.statusCode});
+  ServerException({required super.message, required super.statusCode});
 }
 
 class BadRequestException extends ApiException {
-  BadRequestException({super.message = 'Bad request', super.statusCode});
+  BadRequestException({required super.message, required super.statusCode});
 }

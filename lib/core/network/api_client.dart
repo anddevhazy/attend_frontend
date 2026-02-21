@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import '../config/flavor_config.dart';
-import '../error/error_messages.dart';
 import 'api_exceptions.dart';
 import 'network_info.dart';
 
@@ -92,54 +91,57 @@ class ApiClient {
 
   Future<void> _ensureConnected() async {
     if (!await _networkInfo.isConnected) {
-      throw NetworkException(message: ErrorMessages.network);
+      throw NetworkException(message: 'No internet connection');
     }
+  }
+
+  String _extractMessage(dynamic data) {
+    if (data is Map<String, dynamic>) {
+      if (data['message'] is String) return data['message'] as String;
+      if (data['error'] is String) return data['error'] as String;
+    }
+    return 'Something went wrong';
   }
 
   ApiException _mapDioError(DioException e) {
     final statusCode = e.response?.statusCode;
     final data = e.response?.data;
+    final message = _extractMessage(data);
 
     switch (e.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.receiveTimeout:
       case DioExceptionType.sendTimeout:
-        return TimeoutException();
+        return TimeoutException(message: 'Request timed out');
 
       case DioExceptionType.badResponse:
         if (statusCode == 401) {
           return UnauthorizedException(
-            message: _extractMessage(data) ?? ErrorMessages.unauthorized,
+            message: message,
+            statusCode: statusCode!,
           );
         }
+
         if (statusCode != null && statusCode >= 500) {
-          return ServerException(
-            message: _extractMessage(data) ?? ErrorMessages.server,
-            statusCode: statusCode,
-          );
+          return ServerException(message: message, statusCode: statusCode);
         }
+
         return BadRequestException(
-          message: _extractMessage(data) ?? ErrorMessages.badRequest,
-          statusCode: statusCode,
+          message: message,
+          statusCode: statusCode ?? 400,
         );
 
-      case DioExceptionType.cancel:
-      case DioExceptionType.unknown:
-      case DioExceptionType.badCertificate:
       case DioExceptionType.connectionError:
+        return NetworkException(message: 'Connection error occurred');
+
+      case DioExceptionType.cancel:
+      case DioExceptionType.badCertificate:
+      case DioExceptionType.unknown:
         return ApiException(
-          message: _extractMessage(data) ?? ErrorMessages.unexpected,
+          message: message,
           statusCode: statusCode,
           data: data,
         );
     }
-  }
-
-  String? _extractMessage(dynamic data) {
-    if (data is Map<String, dynamic>) {
-      if (data['message'] is String) return data['message'] as String;
-      if (data['error'] is String) return data['error'] as String;
-    }
-    return null;
   }
 }

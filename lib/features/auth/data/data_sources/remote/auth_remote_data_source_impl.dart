@@ -20,7 +20,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         ApiEndpoints.studentSignup,
         data: {'email': email, 'password': password},
       );
-      print('signing up');
       return Right({
         'id': response.data['data']['id'],
         'email': response.data['data']['email'],
