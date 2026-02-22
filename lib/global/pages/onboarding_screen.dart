@@ -2,6 +2,7 @@ import 'package:attend/global/constants/assets.dart';
 import 'package:attend/global/constants/colors.dart';
 import 'package:attend/global/constants/spacing.dart';
 import 'package:attend/global/constants/text_styles.dart';
+import 'package:attend/global/enums/role.dart';
 import 'package:attend/global/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -51,7 +52,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: TextButton(
                 onPressed: () {
                   // navigation to role selection
-                  context.goNamed(Routes.roleSelectionName);
+                  context.goNamed(Routes.loginName, extra: Role.lecturer);
                 },
                 child: Text(
                   'Skip',
@@ -160,7 +161,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       onPressed: () {
                         if (_currentPage == _pages.length - 1) {
                           // navigation to Role Selection
-                          context.goNamed(Routes.roleSelectionName);
+                          context.goNamed(
+                            Routes.loginName,
+                            extra: Role.lecturer,
+                          );
                         } else {
                           _pageController.nextPage(
                             duration: const Duration(milliseconds: 400),

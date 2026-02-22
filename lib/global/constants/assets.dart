@@ -72,4 +72,7 @@ class AppAssets {
   static const String moniepointAD = 'assets/images/moniepoint_ad.png';
 
   static const String moniepointAdvert = 'assets/images/moniepoint_advert.png';
+
+  static const String googleContinueButton =
+      'assets/images/android_light_rd_ctn.svg';
 }
