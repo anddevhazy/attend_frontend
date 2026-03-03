@@ -2,6 +2,7 @@ import 'package:attend/global/constants/assets.dart';
 import 'package:attend/global/constants/colors.dart';
 import 'package:attend/global/constants/spacing.dart';
 import 'package:attend/global/constants/text_styles.dart';
+import 'package:attend/global/enums/role.dart';
 import 'package:attend/global/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,7 +31,8 @@ class _SplashScreenState extends State<SplashScreen> {
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
       // Go to onboarding
-      context.goNamed(Routes.onboardingName);
+      // context.goNamed(Routes.loginName);
+      context.goNamed(Routes.loginName, extra: Role.lecturer);
     });
   }
 

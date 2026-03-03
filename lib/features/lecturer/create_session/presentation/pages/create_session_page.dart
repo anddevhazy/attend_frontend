@@ -95,13 +95,13 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
 
       body: CustomScrollView(
         slivers: [
-          const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.lg)),
+          const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.sm)),
 
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(
-              AppSpacing.xl,
+              AppSpacing.sm,
               0,
-              AppSpacing.xl,
+              AppSpacing.sm,
               120, // room for bottom CTA
             ),
             sliver: SliverToBoxAdapter(
@@ -199,64 +199,6 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                       items: locations,
                       onChanged:
                           (val) => setState(() => selectedLocation = val),
-                    ),
-
-                    const SizedBox(height: AppSpacing.xl),
-
-                    // Duration (better hierarchy)
-                    const _SectionTitle('Session duration'),
-                    const SizedBox(height: AppSpacing.md),
-                    _DurationTile(
-                      useExactTime: useExactTime,
-                      minutes: durationMinutes,
-                      startTime: startTime,
-                      endTime: endTime,
-                      onModeChanged: (val) {
-                        setState(() {
-                          useExactTime = val;
-                          if (!useExactTime) {
-                            // reset exact times (optional)
-                            startTime = null;
-                            endTime = null;
-                          } else {
-                            // sensible defaults when switching to exact
-                            startTime ??= TimeOfDay.now();
-                          }
-                        });
-                      },
-                      onMinutesChanged:
-                          (m) => setState(() => durationMinutes = m),
-                      onStartNow: () {
-                        setState(() {
-                          startTime = TimeOfDay.now();
-                          // optional: if end isn't set, set it to start + duration
-                          endTime ??= _addMinutes(startTime!, durationMinutes);
-                        });
-                      },
-                      onStartChanged: (t) {
-                        setState(() {
-                          startTime = t;
-                          if (startTime != null && endTime != null) {
-                            durationMinutes = _diffMinutes(
-                              startTime!,
-                              endTime!,
-                            );
-                          } else if (startTime != null && endTime == null) {
-                            endTime = _addMinutes(startTime!, durationMinutes);
-                          }
-                        });
-                      },
-                      onEndChanged: (t) {
-                        setState(() {
-                          endTime = t;
-                          if (startTime != null && endTime != null) {
-                            durationMinutes = _diffMinutes(
-                              startTime!,
-                              endTime!,
-                            );
-                          }
-                        });
-                      },
                     ),
                   ],
                 ),

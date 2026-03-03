@@ -18,7 +18,7 @@ class LecturerHomePage extends StatefulWidget {
 
 class _LecturerHomePageState extends State<LecturerHomePage> {
   // Toggle to test both states
-  bool _hasActiveSession = false;
+  bool _hasActiveSession = true;
 
   @override
   void initState() {
@@ -71,14 +71,10 @@ class _LecturerHomePageState extends State<LecturerHomePage> {
       // ✅ Proper top bar as AppBar (not part of body)
       appBar: _LecturerAppBar(
         initials: 'DO',
-        greeting: 'Welcome back sir',
+        greeting: 'Welcome back ',
         name: 'Dr. Okafor',
         // 4. Secret Trigger Logic
-        onNameTap: () {
-          setState(() {
-            _hasActiveSession = !_hasActiveSession;
-          });
-        },
+        onNameTap: () {},
         onHistoryTap: () {
           context.pushNamed(Routes.lecturerHistoryName);
         },
@@ -177,58 +173,68 @@ class _LecturerAppBar extends StatelessWidget implements PreferredSizeWidget {
       titleSpacing: 0,
       title: Padding(
         padding: const EdgeInsets.fromLTRB(
-          AppSpacing.xl,
           AppSpacing.md,
-          AppSpacing.xl,
+          AppSpacing.md,
+          AppSpacing.sm,
           AppSpacing.md,
         ),
         child: Row(
           children: [
-            CircleAvatar(
-              radius: 24,
-              backgroundColor: AppColors.accent.withOpacity(0.14),
+            GestureDetector(
+              onTap: onNameTap,
+              behavior: HitTestBehavior.opaque,
               child: Text(
-                initials,
+                name,
                 style: AppTextStyles.h2.copyWith(
-                  fontSize: 18,
+                  fontSize: 20,
                   color: AppColors.primary,
                 ),
               ),
             ),
-            const SizedBox(width: AppSpacing.md),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  greeting,
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.textPrimary.withOpacity(0.65),
-                    height: 1.0,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                GestureDetector(
-                  onTap: onNameTap,
-                  behavior: HitTestBehavior.opaque,
-                  child: Text(
-                    name,
-                    style: AppTextStyles.h2.copyWith(
-                      fontSize: 20,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ),
-              ],
-            ),
             const Spacer(),
-            IconButton(
-              icon: Icon(
-                Icons.history_rounded,
-                color: AppColors.primary,
-                size: 28,
+            PopupMenuButton<String>(
+              tooltip: "",
+              color: AppColors.white,
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
               ),
-              onPressed: onHistoryTap,
+              icon: Icon(Icons.more_vert, color: AppColors.primary, size: 28),
+              onSelected: (value) {
+                switch (value) {
+                  case 'history':
+                    onHistoryTap();
+                    break;
+
+                  case 'logout':
+                    // TODO: logout logic
+                    break;
+                }
+              },
+              itemBuilder:
+                  (context) => [
+                    PopupMenuItem(
+                      value: 'history',
+                      child: Text(
+                        'History',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+
+                    PopupMenuItem(
+                      value: 'logout',
+                      child: Text(
+                        'Log Out',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.error,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
             ),
           ],
         ),
@@ -401,15 +407,6 @@ class _SessionCardState extends State<_SessionCard> {
 
           const SizedBox(height: AppSpacing.lg),
 
-          Text(
-            'Actions',
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textPrimary.withOpacity(0.65),
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-
           // Actions grid (still within same card)
           Row(
             children: [
@@ -421,18 +418,6 @@ class _SessionCardState extends State<_SessionCard> {
                   tone: _ActionTone.danger,
                   onTap: () {
                     // TODO: end this session
-                  },
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: _ActionButton(
-                  title: 'Extend Time',
-                  subtitle: 'Add to the duration',
-                  icon: Icons.timer_rounded,
-                  tone: _ActionTone.primary,
-                  onTap: () {
-                    // TODO: extend this session
                   },
                 ),
               ),
@@ -468,7 +453,7 @@ class _LivePill extends StatelessWidget {
           Icon(Icons.circle, color: color, size: 10),
           const SizedBox(width: 8),
           Text(
-            isLive ? 'Live • $endsIn' : 'Paused',
+            isLive ? 'Live' : 'Paused',
             style: AppTextStyles.bodyMedium.copyWith(
               color: AppColors.textPrimary,
               fontWeight: FontWeight.w800,
@@ -488,9 +473,9 @@ class _NoActiveSessionView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(
-        AppSpacing.xl,
-        AppSpacing.lg,
-        AppSpacing.xl,
+        AppSpacing.sm,
+        AppSpacing.sm,
+        AppSpacing.sm,
         120, // room for bottom CTA
       ),
       child: Column(
@@ -520,7 +505,7 @@ class _NoActiveSessionView extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 Text(
-                  'No active sessions',
+                  'No active session',
                   style: AppTextStyles.h2.copyWith(
                     fontSize: 22,
                     color: AppColors.primary,
@@ -529,7 +514,7 @@ class _NoActiveSessionView extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  'Start a session to begin taking attendance. You can run multiple sessions when needed.',
+                  'Start a session to begin taking attendance. ',
                   style: AppTextStyles.bodyLarge.copyWith(
                     fontSize: 14.5,
                     height: 1.45,
@@ -544,42 +529,6 @@ class _NoActiveSessionView extends StatelessWidget {
           const SizedBox(height: AppSpacing.lg),
 
           // A small “hint” block to reduce emptiness and guide usage
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.04),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.primary.withOpacity(0.06)),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Icon(
-                    Icons.info_outline_rounded,
-                    color: AppColors.primary,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Text(
-                    'Tip: If you teach back-to-back classes, start each session separately so the attendance lists don’t mix.',
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.textPrimary.withOpacity(0.75),
-                      fontWeight: FontWeight.w600,
-                      height: 1.35,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );

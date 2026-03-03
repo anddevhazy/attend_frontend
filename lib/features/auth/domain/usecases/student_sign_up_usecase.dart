@@ -1,16 +1,13 @@
-import 'package:attend/core/error/failures.dart';
+import 'package:attend/features/auth/domain/entities/auth_entity.dart';
 import 'package:attend/features/auth/domain/repositories/auth_repository.dart';
-import 'package:dartz/dartz.dart';
+import 'package:attend/features/lecturer/lecturer_entity.dart';
 
-class StudentSignUpUsecase {
+class ContinueWithGoogleUseCase {
   final AuthRepository repository;
 
-  StudentSignUpUsecase({required this.repository});
+  ContinueWithGoogleUseCase({required this.repository});
 
-  Future<Either<Failure, Map<String, dynamic>>> call(
-    String email,
-    String password,
-  ) async {
-    return await repository.studentSignUp(email, password);
+  Future<(AuthEntity, LecturerEntity)> call() async {
+    return await repository.continueWithGoogle();
   }
 }

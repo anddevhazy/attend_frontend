@@ -1,9 +1,7 @@
-import 'package:attend/core/error/failures.dart';
-import 'package:dartz/dartz.dart';
+import 'package:attend/features/auth/domain/entities/auth_entity.dart';
+import 'package:attend/features/lecturer/lecturer_entity.dart';
 
 abstract class AuthRemoteDataSource {
-  Future<Either<Failure, Map<String, dynamic>>> studentSignUp(
-    String email,
-    String password,
-  );
+  Future<(AuthEntity, LecturerEntity)> continueWithGoogle();
+  // Future<void> logout();
 }

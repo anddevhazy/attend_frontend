@@ -13,9 +13,13 @@ Future<void> authInjectionContainer() async {
   );
 
   // * USE CASES INJECTION
-  sl.registerLazySingleton<StudentSignUpUsecase>(
-    () => StudentSignUpUsecase(repository: sl.call()),
+  sl.registerLazySingleton<ContinueWithGoogleUseCase>(
+    () => ContinueWithGoogleUseCase(repository: sl.call()),
   );
+
+  // sl.registerLazySingleton<LogoutUseCase>(
+  //   () => LogoutUseCase(repository: sl.call()),
+  // );
 
   // * REPOSITORY & DATA SOURCES INJECTION
   sl.registerLazySingleton<AuthRepository>(
@@ -23,6 +27,6 @@ Future<void> authInjectionContainer() async {
   );
 
   sl.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(client: sl.call()),
+    () => AuthRemoteDataSourceImpl(client: sl.call(), googleSignIn: sl.call()),
   );
 }

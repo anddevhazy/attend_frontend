@@ -16,6 +16,10 @@ class UnauthorizedFailure extends Failure {
   const UnauthorizedFailure(super.message);
 }
 
+class AuthenticationFailure extends Failure {
+  const AuthenticationFailure(super.message);
+}
+
 class CacheFailure extends Failure {
   const CacheFailure(super.message);
 }

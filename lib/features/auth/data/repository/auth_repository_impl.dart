@@ -1,7 +1,7 @@
-import 'package:attend/core/error/failures.dart';
 import 'package:attend/features/auth/data/data_sources/remote/auth_remote_data_source.dart';
-import 'package:attend/features/auth/domain/repositories/auth_repository.dart';
-import 'package:dartz/dartz.dart';
+import 'package:attend/features/lecturer/lecturer_entity.dart';
+import '../../domain/entities/auth_entity.dart';
+import '../../domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
@@ -9,8 +9,6 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl({required this.remoteDataSource});
 
   @override
-  Future<Either<Failure, Map<String, dynamic>>> studentSignUp(
-    String email,
-    String password,
-  ) async => remoteDataSource.studentSignUp(email, password);
+  Future<(AuthEntity, LecturerEntity)> continueWithGoogle() =>
+      remoteDataSource.continueWithGoogle();
 }

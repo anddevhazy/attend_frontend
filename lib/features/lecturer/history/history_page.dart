@@ -64,7 +64,7 @@ class _LecturerHistoryGradingPageState extends State<LecturerHistoryGradingPage>
           onPressed: () => context.pop(),
         ),
         title: Text(
-          "History & Grading",
+          "History",
           style: AppTextStyles.h2.copyWith(
             fontSize: 20,
             color: AppColors.primary,
@@ -88,12 +88,6 @@ class _LecturerHistoryGradingPageState extends State<LecturerHistoryGradingPage>
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
             child: Column(
               children: [
-                _CoursePicker(
-                  courses: _courses,
-                  selected: _selectedCourse,
-                  onChanged: (c) => setState(() => _selectedCourse = c),
-                ),
-                const SizedBox(height: AppSpacing.sm),
                 Row(
                   children: [
                     Expanded(
@@ -109,44 +103,7 @@ class _LecturerHistoryGradingPageState extends State<LecturerHistoryGradingPage>
             ),
           ),
 
-          const SizedBox(height: AppSpacing.lg),
-
-          // Tabs
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-            child: Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.primary.withOpacity(0.06)),
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 18,
-                    offset: const Offset(0, 10),
-                    color: AppColors.primary.withOpacity(0.04),
-                  ),
-                ],
-              ),
-              child: TabBar(
-                controller: _tabController,
-                indicatorSize: TabBarIndicatorSize.tab,
-                dividerColor: Colors.transparent,
-                labelColor: AppColors.white,
-                unselectedLabelColor: AppColors.textPrimary.withOpacity(0.72),
-                labelStyle: AppTextStyles.bodyMedium.copyWith(
-                  fontWeight: FontWeight.w900,
-                ),
-                indicator: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                tabs: const [Tab(text: "History"), Tab(text: "Grading")],
-              ),
-            ),
-          ),
-
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacing.md),
 
           // Tab content
           Expanded(
@@ -1032,7 +989,7 @@ class _SessionCard extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  "${pct.round()}% present",
+                  "CSC 301",
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.textPrimary.withOpacity(0.85),
                     fontWeight: FontWeight.w900,

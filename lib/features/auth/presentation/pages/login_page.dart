@@ -32,15 +32,15 @@ class _LoginPageState extends State<LoginPage> {
         backgroundColor: AppColors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: AppColors.primary,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(
+        //     Icons.arrow_back_ios_new_rounded,
+        //     color: AppColors.primary,
+        //   ),
+        //   onPressed: () => Navigator.pop(context),
+        // ),
         title: Text(
-          roleLabel,
+          "Attend",
           style: AppTextStyles.h2.copyWith(
             fontSize: 18,
             color: AppColors.primary,
@@ -68,7 +68,7 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: AppSpacing.lg),
 
                 Text(
-                  "Welcome back",
+                  "Welcome",
                   style: AppTextStyles.h1.copyWith(
                     fontSize: 28,
                     color: AppColors.primary,
@@ -91,14 +91,12 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: AppSpacing.lg),
 
-                InkWell(
-                  onTap: () => context.goNamed(Routes.studentHomeName),
-                  borderRadius: BorderRadius.circular(18),
-                  child: Center(
-                    child: SvgPicture.asset(
-                      AppAssets.googleContinueButton,
-                      fit: BoxFit.contain,
-                    ),
+                Align(
+                  alignment: Alignment.center,
+                  child: InkWell(
+                    onTap: () => context.goNamed(Routes.lecturerHomeName),
+                    borderRadius: BorderRadius.circular(18),
+                    child: SvgPicture.asset(AppAssets.googleContinueButton),
                   ),
                 ),
               ],
