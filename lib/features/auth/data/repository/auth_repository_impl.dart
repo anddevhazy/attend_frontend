@@ -11,4 +11,10 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<(AuthEntity, LecturerEntity)> continueWithGoogle() =>
       remoteDataSource.continueWithGoogle();
+
+  @override
+  Future<void> logout() {
+    // TODO: implement logout
+    throw UnimplementedError();
+  }
 }

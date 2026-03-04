@@ -2,7 +2,7 @@ import 'package:attend/features/auth/data/data_sources/remote/auth_remote_data_s
 import 'package:attend/features/auth/data/data_sources/remote/auth_remote_data_source_impl.dart';
 import 'package:attend/features/auth/data/repository/auth_repository_impl.dart';
 import 'package:attend/features/auth/domain/repositories/auth_repository.dart';
-import 'package:attend/features/auth/domain/usecases/student_sign_up_usecase.dart';
+import 'package:attend/features/auth/domain/usecases/continue_with_google_usecase.dart';
 import 'package:attend/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:attend/service_locator.dart';
 

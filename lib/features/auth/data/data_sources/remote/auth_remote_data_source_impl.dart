@@ -43,7 +43,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     );
 
     final userEntity = LecturerEntity(
-      id: userMap['id'],
+      lecturerId: userMap['id'],
       name: userMap['name'],
       email: userMap['email'],
       role: userMap['role'],

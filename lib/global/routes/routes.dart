@@ -1,6 +1,6 @@
 import 'package:attend/features/auth/presentation/pages/login_page.dart';
 import 'package:attend/features/auth/presentation/pages/signup_page.dart';
-import 'package:attend/features/lecturer/create_session/presentation/pages/create_session_page.dart';
+import 'package:attend/features/lecturer/session/presentation/pages/create_session_page.dart';
 import 'package:attend/features/lecturer/history/history_page.dart';
 import 'package:attend/features/lecturer/lecturer_home/presentation/pages/lecturer_home_page.dart';
 import 'package:attend/features/lecturer/review_override_request/presentation/pages/review_override_request_page.dart';

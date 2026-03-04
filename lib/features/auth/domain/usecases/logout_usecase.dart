@@ -1,11 +1,11 @@
-// import 'package:attend/features/auth/domain/repositories/auth_repository.dart';
+import 'package:attend/features/auth/domain/repositories/auth_repository.dart';
 
-// class LogoutUseCase {
-//   final AuthRepository repository;
+class LogoutUseCase {
+  final AuthRepository repository;
 
-//   LogoutUseCase({required this.repository});
+  LogoutUseCase({required this.repository});
 
-//   Future<void> call() async {
-//     await repository.logout();
-//   }
-// }
+  Future<void> call() async {
+    await repository.logout();
+  }
+}

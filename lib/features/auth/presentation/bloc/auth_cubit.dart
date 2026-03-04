@@ -1,4 +1,4 @@
-import 'package:attend/features/auth/domain/usecases/student_sign_up_usecase.dart';
+import 'package:attend/features/auth/domain/usecases/continue_with_google_usecase.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
