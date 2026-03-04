@@ -20,6 +20,8 @@ class SessionModel extends SessionEntity {
       locationId: LocationEntity(locationId: json['locationId']),
       isLive: json['status'] == 'live',
       sessionDate: DateTime.parse(json['createdAt']),
+      present: json['present'],
+      denied: json['denied'],
     );
   }
 

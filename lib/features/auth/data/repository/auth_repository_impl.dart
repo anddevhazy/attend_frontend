@@ -23,9 +23,4 @@ class AuthRepositoryImpl implements AuthRepository {
 
     return result;
   }
-
-  @override
-  Future<void> logout() async {
-    await localDataSource.logout();
-  }
 }

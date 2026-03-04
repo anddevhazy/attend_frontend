@@ -1,4 +1,3 @@
-import 'package:attend/features/lecturer/lecturer_entity.dart';
 import 'package:attend/features/lecturer/session/domain/repositories/session_repository.dart';
 
 class FetchNumberOfPastSessionsUsecase {
@@ -6,7 +5,7 @@ class FetchNumberOfPastSessionsUsecase {
 
   FetchNumberOfPastSessionsUsecase({required this.repository});
 
-  Future<int> call(LecturerEntity lecturerId) async {
+  Future<int> call(String lecturerId) async {
     return await repository.fetchNumberOfPastSessions(lecturerId);
   }
 }

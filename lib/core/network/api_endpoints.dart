@@ -23,6 +23,13 @@ class ApiEndpoints {
   static const String approveOverride = '$base/lecturer/approve-override';
   static const String denyOverride = '$base/lecturer/deny-override';
 
+  static const String fetchLiveSession = '$base/lecturer/fetch-live-session';
+  static String endSession(String sessionId) =>
+      '$base/lecturer/sessions/$sessionId/end-session';
+  static const String fetchNumberOfPastSessions =
+      '$base/lecturer/sessions/past/count';
+  static const String fetchPastSessions = '$base/lecturer/sessions/past';
+
   // ---------------- STUDENT ----------------
   static const String fetchCourses = '$base/student/fetch-courses';
   static const String selectCourses = '$base/student/select-courses';

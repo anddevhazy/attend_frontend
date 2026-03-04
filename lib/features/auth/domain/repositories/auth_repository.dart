@@ -3,5 +3,4 @@ import 'package:attend/features/lecturer/lecturer_entity.dart';
 
 abstract class AuthRepository {
   Future<(AuthEntity, LecturerEntity)> continueWithGoogle();
-  Future<void> logout();
 }

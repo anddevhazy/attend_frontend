@@ -1,4 +1,3 @@
-import 'package:attend/features/lecturer/session/domain/entities/session_entity.dart';
 import 'package:attend/features/lecturer/session/domain/repositories/session_repository.dart';
 
 class EndSessionUsecase {
@@ -6,7 +5,7 @@ class EndSessionUsecase {
 
   EndSessionUsecase({required this.repository});
 
-  Future<void> call(SessionEntity sessionEntity) async {
-    await repository.endSession(sessionEntity);
+  Future<void> call(String sessionId) async {
+    await repository.endSession(sessionId);
   }
 }

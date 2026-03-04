@@ -1,9 +1,8 @@
 import 'package:attend/core/network/api_client.dart';
 import 'package:attend/core/network/api_endpoints.dart';
-import 'package:attend/features/lecturer/lecturer_entity.dart';
 import 'package:attend/features/lecturer/session/data/data_sources/session_remote_data_source.dart';
+import 'package:attend/features/lecturer/session/data/models/session_model.dart';
 import 'package:attend/features/lecturer/session/domain/entities/session_entity.dart';
-import 'package:dio/dio.dart';
 
 class SessionRemoteDataSourceImpl implements SessionRemoteDataSource {
   final ApiClient client;
@@ -15,30 +14,44 @@ class SessionRemoteDataSourceImpl implements SessionRemoteDataSource {
     await client.postRequest(
       ApiEndpoints.createSession,
       data: {
-        'courseId': sessionEntity.courseId.courseId,
-        'locationId': sessionEntity.locationId.locationId,
+        "courseId": sessionEntity.courseId.courseId,
+        "locationId": sessionEntity.locationId.locationId,
       },
-      options: Options(headers: {"Authorization": "Bearer YOUR_JWT_TOKEN"}),
     );
   }
 
   @override
-  Future<void> endSession(SessionEntity sessionId) {
-    throw UnimplementedError();
+  Future<void> endSession(String sessionId) async {
+    await client.postRequest(ApiEndpoints.endSession(sessionId));
   }
 
   @override
-  Future<SessionEntity> fetchLiveSession(LecturerEntity lecturerId) {
-    throw UnimplementedError();
+  Future<SessionEntity> fetchLiveSession(String lecturerId) async {
+    final response = await client.getRequest<Map<String, dynamic>>(
+      ApiEndpoints.fetchLiveSession,
+    );
+
+    final json = response.data?['data'] as Map<String, dynamic>;
+    return SessionModel.fromJson(json);
   }
 
   @override
-  Future<int> fetchNumberOfPastSessions(LecturerEntity lecturerId) {
-    throw UnimplementedError();
+  Future<int> fetchNumberOfPastSessions(String lecturerId) async {
+    final response = await client.getRequest(
+      ApiEndpoints.fetchNumberOfPastSessions,
+    );
+
+    final data = response.data as Map<String, dynamic>;
+
+    return data['data']['count'] as int;
   }
 
   @override
-  Future<List<SessionEntity>> fetchPastSessions(LecturerEntity lecturerId) {
-    throw UnimplementedError();
+  Future<List<SessionEntity>> fetchPastSessions(String lecturerId) async {
+    final response = await client.getRequest(ApiEndpoints.fetchPastSessions);
+
+    final List data = response.data['data'];
+
+    return data.map((session) => SessionModel.fromJson(session)).toList();
   }
 }
