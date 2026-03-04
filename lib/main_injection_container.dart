@@ -1,15 +1,16 @@
+import 'package:attend/core/network/api_interceptors.dart';
 import 'package:attend/features/auth/auth_injection_container.dart';
+import 'package:attend/features/auth/data/data_sources/local/auth_local_data_source.dart';
 import 'package:attend/service_locator.dart';
+import 'package:attend/storage/token_storage.dart';
+import 'package:attend/storage/token_storage_impl.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'core/network/api_client.dart';
-import 'core/network/api_interceptors.dart';
 import 'core/network/network_info.dart';
 
 Future<void> init() async {
-  // * CORE
-
-  // Connectivity & Network info
   sl.registerLazySingleton<Connectivity>(() => Connectivity());
   sl.registerLazySingleton<NetworkInfo>(
     () => NetworkInfoImpl(sl<Connectivity>()),
@@ -26,19 +27,29 @@ Future<void> init() async {
   //   () => NetworkInfoImpl(sl.call()),
   // );
 
-  // Dio HTTP client
-  sl.registerLazySingleton<Dio>(() => Dio());
+  sl.registerLazySingleton<Dio>(() {
+    final dio = Dio();
 
-  // ApiClient with interceptors
+    dio.interceptors.add(sl<AuthInterceptor>());
+
+    return dio;
+  });
+
+  sl.registerLazySingleton<FlutterSecureStorage>(() => FlutterSecureStorage());
+
+  sl.registerLazySingleton<TokenStorage>(
+    () => TokenStorageImpl(sl<FlutterSecureStorage>()),
+  );
+
+  sl.registerLazySingleton<AuthInterceptor>(
+    () => AuthInterceptor(sl<AuthLocalDataSource>()),
+  );
+
   sl.registerLazySingleton<ApiClient>(() {
     final dio = sl<Dio>();
 
-    dio.interceptors.addAll([AuthInterceptor()]);
-
     return ApiClient(dio, sl<NetworkInfo>());
   });
-
-  // * FEATURES
 
   await authInjectionContainer();
 }
