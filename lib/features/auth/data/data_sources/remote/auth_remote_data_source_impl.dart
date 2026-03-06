@@ -42,13 +42,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       role: userMap['role'],
     );
 
-    final userEntity = LecturerEntity(
+    final lecturerEntity = LecturerEntity(
       lecturerId: userMap['id'],
       name: userMap['name'],
       email: userMap['email'],
       role: userMap['role'],
     );
 
-    return (authEntity, userEntity);
+    return (authEntity, lecturerEntity);
   }
 }

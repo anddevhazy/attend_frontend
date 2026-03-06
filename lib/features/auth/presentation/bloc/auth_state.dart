@@ -16,12 +16,12 @@ class Loading extends AuthState {
 }
 
 class Successful extends AuthState {
-  final String message;
+  final LecturerEntity lecturer;
 
-  Successful({required this.message});
+  Successful({required this.lecturer});
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [lecturer];
 }
 
 class Failed extends AuthState {
