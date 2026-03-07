@@ -1,8 +1,7 @@
 import 'package:attend/features/auth/presentation/pages/login_page.dart';
-import 'package:attend/features/lecturer/history/presentation/pages/history_page.dart';
-import 'package:attend/features/lecturer/session/presentation/pages/create_session_page.dart';
-import 'package:attend/features/lecturer/lecturer_home/presentation/pages/lecturer_home_page.dart';
-import 'package:attend/features/lecturer/review_override_request/presentation/pages/review_override_request_page.dart';
+import 'package:attend/features/lecturer/presentation/pages/history_page.dart';
+import 'package:attend/features/lecturer/presentation/pages/create_session_page.dart';
+import 'package:attend/features/lecturer/presentation/pages/lecturer_home_page.dart';
 import 'package:attend/features/student/course_selection/presentation/pages/student_course_selection_page.dart';
 import 'package:attend/features/student/home/presentation/pages/active_session_page.dart';
 import 'package:attend/features/student/home/presentation/pages/student_home_page.dart';
@@ -184,11 +183,7 @@ class Routes {
         name: createSessionName,
         builder: (context, state) => const CreateSessionPage(),
       ),
-      GoRoute(
-        path: reviewOverrideRequestPath,
-        name: reviewOverrideRequestName,
-        builder: (context, state) => const ReviewOverrideRequestPage(),
-      ),
+
       // GoRoute(
       //   path: credentialUploadPath,
       //   name: credentialUploadName,

@@ -5,14 +5,17 @@ import 'package:attend/features/auth/data/data_sources/remote/auth_remote_data_s
 import 'package:attend/features/auth/data/repository/auth_repository_impl.dart';
 import 'package:attend/features/auth/domain/repositories/auth_repository.dart';
 import 'package:attend/features/auth/domain/usecases/continue_with_google_usecase.dart';
+import 'package:attend/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:attend/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:attend/service_locator.dart';
-import 'package:attend/storage/token_storage.dart';
 
 Future<void> authInjectionContainer() async {
   // * CUBITS INJECTION
   sl.registerFactory<AuthCubit>(
-    () => AuthCubit(studentSignUpUsecase: sl.call()),
+    () => AuthCubit(
+      continueWithGoogleUseCase: sl.call(),
+      logoutUseCase: sl.call(),
+    ),
   );
 
   // * USE CASES INJECTION
@@ -20,9 +23,9 @@ Future<void> authInjectionContainer() async {
     () => ContinueWithGoogleUseCase(repository: sl.call()),
   );
 
-  // sl.registerLazySingleton<LogoutUseCase>(
-  //   () => LogoutUseCase(repository: sl.call()),
-  // );
+  sl.registerLazySingleton<LogoutUseCase>(
+    () => LogoutUseCase(repository: sl.call()),
+  );
 
   // * REPOSITORY & DATA SOURCES INJECTION
   sl.registerLazySingleton<AuthRepository>(
@@ -37,6 +40,6 @@ Future<void> authInjectionContainer() async {
   );
 
   sl.registerLazySingleton<AuthLocalDataSource>(
-    () => AuthLocalDataSourceImpl(sl<TokenStorage>()),
+    () => AuthLocalDataSourceImpl(tokenStorage: sl.call()),
   );
 }

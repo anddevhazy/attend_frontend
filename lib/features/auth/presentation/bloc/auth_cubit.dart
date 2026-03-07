@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:attend/features/auth/domain/usecases/continue_with_google_usecase.dart';
-import 'package:attend/features/lecturer/lecturer_entity.dart';
+import 'package:attend/features/auth/domain/usecases/logout_usecase.dart';
+import 'package:attend/features/lecturer/domain/entities/lecturer_entity.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
@@ -9,9 +10,12 @@ part 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final ContinueWithGoogleUseCase continueWithGoogleUseCase;
-  final Logout
+  final LogoutUseCase logoutUseCase;
 
-  AuthCubit({required this.continueWithGoogleUseCase}) : super(Initial());
+  AuthCubit({
+    required this.continueWithGoogleUseCase,
+    required this.logoutUseCase,
+  }) : super(Initial());
   Future<void> continueWithGoogle() async {
     emit(Loading());
 
@@ -30,13 +34,11 @@ class AuthCubit extends Cubit<AuthState> {
     emit(Loading());
 
     try {
-      final result = await continueWithGoogleUseCase.call();
+      await logoutUseCase.call();
 
-      final lecturer = result.$2;
-
-      emit(Successful(lecturer: lecturer));
+      emit(SuccessfullyLoggedOut(message: "Logged out successfully"));
     } catch (e) {
-      emit(Failed(message: "Google sign-in failed: ${e.toString()}"));
+      emit(Failed(message: "Failed to log out: ${e.toString()}"));
     }
   }
 }

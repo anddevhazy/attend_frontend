@@ -1,8 +1,8 @@
-import 'package:attend/core/network/api_client.dart';
-import 'package:attend/core/network/api_endpoints.dart';
+import 'package:attend/global/core/network/api_client.dart';
+import 'package:attend/global/core/network/api_endpoints.dart';
 import 'package:attend/features/auth/data/data_sources/remote/auth_remote_data_source.dart';
 import 'package:attend/features/auth/domain/entities/auth_entity.dart';
-import 'package:attend/features/lecturer/lecturer_entity.dart';
+import 'package:attend/features/lecturer/domain/entities/lecturer_entity.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -33,12 +33,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
     final data = response.data as Map<String, dynamic>;
 
-    final token = data['token'] as String;
+    final accessToken = data['accessToken'] as String;
+    final refreshToken = data['refreshToken'] as String;
     final userMap = data['user'] as Map<String, dynamic>;
 
     final authEntity = AuthEntity(
       userId: userMap['id'],
-      token: token,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
       role: userMap['role'],
     );
 
@@ -50,5 +52,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     );
 
     return (authEntity, lecturerEntity);
+  }
+
+  @override
+  Future<void> logout(String refreshToken) async {
+    await client.postRequest(
+      ApiEndpoints.logout,
+      data: {"refreshToken": refreshToken},
+    );
+
+    await googleSignIn.signOut();
   }
 }

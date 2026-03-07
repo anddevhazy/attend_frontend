@@ -1,4 +1,4 @@
-abstract class AuthLocalDataSource {
+abstract class TokenStorage {
   Future<void> saveAccessToken(String token);
 
   Future<void> saveRefreshToken(String token);
@@ -7,5 +7,5 @@ abstract class AuthLocalDataSource {
 
   Future<String?> getRefreshToken();
 
-  Future<void> logout();
+  Future<void> clearTokens();
 }

@@ -24,6 +24,15 @@ class Successful extends AuthState {
   List<Object?> get props => [lecturer];
 }
 
+class SuccessfullyLoggedOut extends AuthState {
+  final String message;
+
+  SuccessfullyLoggedOut({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}
+
 class Failed extends AuthState {
   final String message;
 
