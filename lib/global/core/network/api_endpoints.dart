@@ -13,7 +13,7 @@ class ApiEndpoints {
 
   static const String lecturerLogin = '$base/auth/lecturer-login';
   static const String studentLogin = '$base/auth/student-login';
-  static const String continuewithGoogle = '$base/auth/continue-with-google';
+  static const String continuewithGoogle = '$base/auth/google';
   static const String refreshToken = '$base/auth/refresh-token';
   static const String logout = '$base/auth/logout';
 

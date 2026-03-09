@@ -1,16 +1,10 @@
 import '../../domain/entities/auth_entity.dart';
 
-class AuthModel {
-  final String accessToken;
-  final String refreshToken;
-  final String userId;
-  final String role;
-
+class AuthModel extends AuthEntity {
   const AuthModel({
-    required this.accessToken,
-    required this.refreshToken,
-    required this.userId,
-    required this.role,
+    required super.accessToken,
+    required super.refreshToken,
+    required super.userId,
   });
 
   factory AuthModel.fromJson(Map<String, dynamic> json) {
@@ -20,16 +14,14 @@ class AuthModel {
       accessToken: json['accessToken'],
       refreshToken: json['refreshToken'],
       userId: user['id'],
-      role: user['role'],
     );
   }
 
-  AuthEntity toEntity() {
-    return AuthEntity(
-      userId: userId,
-      accessToken: accessToken,
-      refreshToken: refreshToken,
-      role: role,
-    );
-  }
+  // AuthEntity toEntity() {
+  //   return AuthEntity(
+  //     userId: userId,
+  //     accessToken: accessToken,
+  //     refreshToken: refreshToken,
+  //   );
+  // }
 }

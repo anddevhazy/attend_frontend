@@ -1,3 +1,5 @@
+import 'package:attend/features/auth/data/models/auth_model.dart';
+import 'package:attend/features/lecturer/data/models/lecturer_model.dart';
 import 'package:attend/global/core/network/api_client.dart';
 import 'package:attend/global/core/network/api_endpoints.dart';
 import 'package:attend/features/auth/data/data_sources/remote/auth_remote_data_source.dart';
@@ -31,27 +33,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       data: {"idToken": idToken},
     );
 
-    final data = response.data as Map<String, dynamic>;
+    final auth = AuthModel.fromJson(response.data);
+    final lecturer = LecturerModel.fromJson(response.data['lecturer']);
 
-    final accessToken = data['accessToken'] as String;
-    final refreshToken = data['refreshToken'] as String;
-    final userMap = data['user'] as Map<String, dynamic>;
-
-    final authEntity = AuthEntity(
-      userId: userMap['id'],
-      accessToken: accessToken,
-      refreshToken: refreshToken,
-      role: userMap['role'],
-    );
-
-    final lecturerEntity = LecturerEntity(
-      lecturerId: userMap['id'],
-      name: userMap['name'],
-      email: userMap['email'],
-      role: userMap['role'],
-    );
-
-    return (authEntity, lecturerEntity);
+    return (auth, lecturer);
   }
 
   @override

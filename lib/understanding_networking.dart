@@ -17,7 +17,7 @@ class _UnderstandingNetworkingState extends State<UnderstandingNetworking> {
       final dio = Dio();
 
       final response = await dio.post(
-        "https://your-backend-url.com/api/v1/auth/dev-login",
+        "https://attend-staging-api.up.railway.app/api/v1/auth/dev-login",
         data: {
           "email": "test@test.com",
           "name": "John",
