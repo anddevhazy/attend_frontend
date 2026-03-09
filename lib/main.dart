@@ -10,7 +10,7 @@ void main() async {
 
   FlavorConfig.init(
     environment: Environment.dev,
-    baseApiUrl: 'https://attend-api-staging.onrender.com',
+    baseApiUrl: 'attend-staging-api.up.railway.app',
   );
 
   await di.init();
