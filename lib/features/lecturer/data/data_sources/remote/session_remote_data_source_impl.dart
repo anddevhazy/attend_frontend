@@ -14,8 +14,8 @@ class SessionRemoteDataSourceImpl implements SessionRemoteDataSource {
     await client.postRequest(
       ApiEndpoints.createSession,
       data: {
-        "courseId": sessionEntity.courseId,
-        "locationId": sessionEntity.locationId,
+        "courseId": sessionEntity.course.courseId,
+        "locationId": sessionEntity.location.locationId,
       },
     );
   }

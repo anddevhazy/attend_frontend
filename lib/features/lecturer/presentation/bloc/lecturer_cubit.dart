@@ -40,6 +40,7 @@ class LecturerCubit extends Cubit<LecturerState> {
       emit(Successful(message: "Session started successfully"));
     } catch (e) {
       emit(Failed(message: "Failed to start session: ${e.toString()}"));
+      print(e);
     }
   }
 

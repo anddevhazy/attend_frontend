@@ -5,8 +5,8 @@ import 'package:attend/features/location/location_entity.dart';
 class SessionModel extends SessionEntity {
   const SessionModel({
     required super.sessionId,
-    required super.courseId,
-    required super.locationId,
+    required super.course,
+    required super.location,
     required super.isLive,
     required super.sessionDate,
     super.present,
@@ -16,8 +16,12 @@ class SessionModel extends SessionEntity {
   factory SessionModel.fromJson(Map<String, dynamic> json) {
     return SessionModel(
       sessionId: json['id'],
-      courseId: CourseEntity(courseId: json['courseId']),
-      locationId: LocationEntity(locationId: json['locationId']),
+      course: CourseEntity(
+        courseId: json['courseId'],
+        courseCode: '',
+        name: '',
+      ),
+      location: LocationEntity(locationId: json['locationId']),
       isLive: json['status'] == 'live',
       sessionDate: DateTime.parse(json['createdAt']),
       present: json['present'],
@@ -26,6 +30,6 @@ class SessionModel extends SessionEntity {
   }
 
   Map<String, dynamic> toJson() {
-    return {'courseId': courseId.courseId, 'locationId': locationId.locationId};
+    return {'courseId': course.courseId, 'locationId': location.locationId};
   }
 }

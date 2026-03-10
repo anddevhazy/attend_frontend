@@ -4,8 +4,8 @@ import 'package:equatable/equatable.dart';
 
 class SessionEntity extends Equatable {
   final String sessionId;
-  final CourseEntity courseId;
-  final LocationEntity locationId;
+  final CourseEntity course;
+  final LocationEntity location;
   final bool isLive;
   final DateTime sessionDate;
   final int? present;
@@ -13,8 +13,8 @@ class SessionEntity extends Equatable {
 
   const SessionEntity({
     required this.sessionId,
-    required this.courseId,
-    required this.locationId,
+    required this.course,
+    required this.location,
     required this.isLive,
     required this.sessionDate,
     this.present,
@@ -24,8 +24,8 @@ class SessionEntity extends Equatable {
   @override
   List<Object?> get props => [
     sessionId,
-    courseId,
-    locationId,
+    course,
+    location,
     present,
     denied,
     isLive,
