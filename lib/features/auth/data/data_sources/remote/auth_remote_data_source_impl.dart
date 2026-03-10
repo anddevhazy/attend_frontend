@@ -34,7 +34,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     );
 
     final auth = AuthModel.fromJson(response.data);
-    final lecturer = LecturerModel.fromJson(response.data['lecturer']);
+    final lecturer = LecturerModel.fromJson(response.data);
 
     return (auth, lecturer);
   }

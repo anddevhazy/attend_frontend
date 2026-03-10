@@ -24,6 +24,10 @@ Future<void> init() async {
 
   //google sign in
   final googleSignIn = GoogleSignIn.instance;
+  await googleSignIn.initialize(
+    serverClientId:
+        "147784093916-qi0k91romnkp9b28ues8no644g0r6sm7.apps.googleusercontent.com",
+  );
   sl.registerLazySingleton(() => googleSignIn);
 
   // flutter secure storage
@@ -38,14 +42,19 @@ Future<void> init() async {
     () => AuthInterceptor(localDataSource: sl<AuthLocalDataSource>()),
   );
   sl.registerLazySingleton<RefreshTokenInterceptor>(
-    () => RefreshTokenInterceptor(sl<Dio>(), sl<AuthLocalDataSource>()),
+    () => RefreshTokenInterceptor(sl<AuthLocalDataSource>()),
   );
   //dio
   sl.registerLazySingleton<Dio>(() {
     final dio = Dio();
 
-    dio.interceptors.add(sl<AuthInterceptor>());
-    dio.interceptors.add(sl<RefreshTokenInterceptor>());
+    final authInterceptor = sl<AuthInterceptor>();
+    final refreshInterceptor = sl<RefreshTokenInterceptor>();
+
+    refreshInterceptor.dio = dio;
+
+    dio.interceptors.add(authInterceptor);
+    dio.interceptors.add(refreshInterceptor);
 
     return dio;
   });

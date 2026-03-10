@@ -3,14 +3,10 @@ import 'package:equatable/equatable.dart';
 class CourseEntity extends Equatable {
   final String courseId;
   final String? courseCode;
-  final String? courseTitle;
+  final String? name;
 
-  const CourseEntity({
-    required this.courseId,
-    this.courseCode,
-    this.courseTitle,
-  });
+  const CourseEntity({required this.courseId, this.courseCode, this.name});
 
   @override
-  List<Object?> get props => [courseId, courseCode, courseTitle];
+  List<Object?> get props => [courseId, courseCode, name];
 }

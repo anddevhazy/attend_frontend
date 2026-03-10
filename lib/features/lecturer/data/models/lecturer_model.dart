@@ -10,14 +10,14 @@ class LecturerModel extends LecturerEntity {
 
   factory LecturerModel.fromJson(Map<String, dynamic> json) {
     return LecturerModel(
-      lecturerId: json['id'],
-      name: json['name'],
-      email: json['email'],
-      role: json['role'],
+      lecturerId: json['user']['id'],
+      name: json['user']['name'],
+      email: json['user']['email'],
+      role: json['user']['role'],
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {'id': lecturerId, 'name': name, 'email': email, 'role': role};
-  }
+  // Map<String, dynamic> toJson() {
+  //   return {'id': lecturerId, 'name': name, 'email': email, 'role': role};
+  // }
 }

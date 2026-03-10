@@ -27,6 +27,7 @@ class AuthCubit extends Cubit<AuthState> {
       emit(Successful(lecturer: lecturer));
     } catch (e) {
       emit(Failed(message: "Google sign-in failed: ${e.toString()}"));
+      print(e);
     }
   }
 

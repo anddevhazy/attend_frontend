@@ -1,6 +1,6 @@
 import 'package:attend/global/core/network/api_client.dart';
 import 'package:attend/global/core/network/api_endpoints.dart';
-import 'package:attend/features/lecturer/data/data_sources/session_remote_data_source.dart';
+import 'package:attend/features/lecturer/data/data_sources/remote/session_remote_data_source.dart';
 import 'package:attend/features/lecturer/data/models/session_model.dart';
 import 'package:attend/features/lecturer/domain/entities/session_entity.dart';
 
@@ -14,8 +14,8 @@ class SessionRemoteDataSourceImpl implements SessionRemoteDataSource {
     await client.postRequest(
       ApiEndpoints.createSession,
       data: {
-        "courseId": sessionEntity.courseId.courseId,
-        "locationId": sessionEntity.locationId.locationId,
+        "courseId": sessionEntity.courseId,
+        "locationId": sessionEntity.locationId,
       },
     );
   }

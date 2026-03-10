@@ -1,4 +1,4 @@
-import 'package:attend/features/lecturer/data/data_sources/session_remote_data_source.dart';
+import 'package:attend/features/lecturer/data/data_sources/remote/session_remote_data_source.dart';
 import 'package:attend/features/lecturer/domain/entities/session_entity.dart';
 import 'package:attend/features/lecturer/domain/repositories/session_repository.dart';
 

@@ -51,6 +51,24 @@ class PastSessionsFetched extends LecturerState {
   List<Object?> get props => [sessions];
 }
 
+class CoursesFetched extends LecturerState {
+  final List<CourseEntity> courses;
+
+  CoursesFetched({required this.courses});
+
+  @override
+  List<Object?> get props => [courses];
+}
+
+class LocationsFetched extends LecturerState {
+  final List<LocationEntity> locations;
+
+  LocationsFetched({required this.locations});
+
+  @override
+  List<Object?> get props => [locations];
+}
+
 class Failed extends LecturerState {
   final String message;
 

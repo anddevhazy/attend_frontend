@@ -18,7 +18,7 @@ class ApiEndpoints {
   static const String logout = '$base/auth/logout';
 
   // ---------------- LECTURER ----------------
-  static const String createSession = '$base/lecturer/create-session';
+  static const String createSession = '$base/sessions/create';
   static String getOverrideRequests(String sessionId) =>
       '$base/lecturer/get-override-requests/$sessionId';
 

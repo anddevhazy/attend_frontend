@@ -4,14 +4,15 @@ import 'package:attend/features/auth/data/data_sources/local/auth_local_data_sou
 import 'package:dio/dio.dart';
 
 class RefreshTokenInterceptor extends Interceptor {
-  final Dio dio;
   final AuthLocalDataSource localDataSource;
+
+  late Dio dio;
 
   final Dio refreshClient = Dio();
 
   bool _isRefreshing = false;
 
-  RefreshTokenInterceptor(this.dio, this.localDataSource) {
+  RefreshTokenInterceptor(this.localDataSource) {
     refreshClient.options.baseUrl = FlavorConfig.instance.baseApiUrl;
   }
 
