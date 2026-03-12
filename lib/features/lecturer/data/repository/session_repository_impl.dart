@@ -16,7 +16,7 @@ class SessionRepositoryImpl implements SessionRepository {
       remoteDataSource.endSession(sessionId);
 
   @override
-  Future<SessionEntity> fetchLiveSession() async =>
+  Future<SessionEntity?> fetchLiveSession() async =>
       remoteDataSource.fetchLiveSession();
 
   @override

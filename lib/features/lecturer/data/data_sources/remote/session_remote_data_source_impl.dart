@@ -3,6 +3,7 @@ import 'package:attend/global/core/network/api_endpoints.dart';
 import 'package:attend/features/lecturer/data/data_sources/remote/session_remote_data_source.dart';
 import 'package:attend/features/lecturer/data/models/session_model.dart';
 import 'package:attend/features/lecturer/domain/entities/session_entity.dart';
+import 'package:attend/global/core/network/api_exceptions.dart';
 
 class SessionRemoteDataSourceImpl implements SessionRemoteDataSource {
   final ApiClient client;
@@ -30,15 +31,6 @@ class SessionRemoteDataSourceImpl implements SessionRemoteDataSource {
   }
 
   @override
-  Future<String> fetchName() async {
-    final response = await client.getRequest(ApiEndpoints.fetchName);
-    print('STATUS CODE: ${response.statusCode}');
-    print('RESPONSE DATA: ${response.data}');
-
-    return response.data['user']['name'] as String;
-  }
-
-  @override
   Future<void> createSession(SessionEntity sessionEntity) async {
     await client.postRequest(
       ApiEndpoints.createSession,
@@ -47,6 +39,15 @@ class SessionRemoteDataSourceImpl implements SessionRemoteDataSource {
         "locationId": sessionEntity.location.locationId,
       },
     );
+  }
+
+  @override
+  Future<String> fetchName() async {
+    final response = await client.getRequest(ApiEndpoints.fetchName);
+    // print('STATUS CODE: ${response.statusCode}');
+    // print('RESPONSE DATA: ${response.data}');
+
+    return response.data['user']['name'] as String;
   }
 
   @override
@@ -59,13 +60,18 @@ class SessionRemoteDataSourceImpl implements SessionRemoteDataSource {
   }
 
   @override
-  Future<SessionEntity> fetchLiveSession() async {
-    final response = await client.getRequest(ApiEndpoints.fetchLiveSession);
-    print('STATUS CODE: ${response.statusCode}');
-    print('RESPONSE DATA: ${response.data}');
+  Future<SessionEntity?> fetchLiveSession() async {
+    try {
+      final response = await client.getRequest(ApiEndpoints.fetchLiveSession);
+      print('STATUS CODE: ${response.statusCode}');
+      print('RESPONSE DATA: ${response.data}');
 
-    final liveSession = SessionModel.fromJson(response.data['data']);
-    print('PARSED SESSION: $liveSession');
-    return liveSession;
+      final liveSession = SessionModel.fromJson(response.data['data']);
+      print('PARSED SESSION: $liveSession');
+      return liveSession;
+    } on BadRequestException catch (e) {
+      if (e.statusCode == 404) return null; // no live session
+      rethrow;
+    }
   }
 }

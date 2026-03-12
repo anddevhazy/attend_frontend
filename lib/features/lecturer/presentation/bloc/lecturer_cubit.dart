@@ -80,7 +80,11 @@ class LecturerCubit extends Cubit<LecturerState> {
 
     try {
       final liveSession = await fetchLiveSessionUsecase.call();
-      emit(LiveSessionFetched(session: liveSession));
+      if (liveSession == null) {
+        emit(NoLiveSession());
+      } else {
+        emit(LiveSessionFetched(session: liveSession));
+      }
     } catch (e, stackTrace) {
       print('FETCH LIVE SESSION ERROR: $e');
       print('STACK TRACE: $stackTrace');
@@ -97,7 +101,6 @@ class LecturerCubit extends Cubit<LecturerState> {
       print('END SESSION SUCCESS, now fetching live session');
 
       await fetchLiveSession();
-      emit(Successful(message: "Session ended successfully"));
     } catch (e) {
       print('END SESSION ERROR: $e');
 

@@ -6,7 +6,7 @@ class FetchLiveSessionUsecase {
 
   FetchLiveSessionUsecase({required this.repository});
 
-  Future<SessionEntity> call() async {
+  Future<SessionEntity?> call() async {
     return await repository.fetchLiveSession();
   }
 }

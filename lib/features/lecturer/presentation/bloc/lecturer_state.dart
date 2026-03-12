@@ -15,6 +15,11 @@ class Loading extends LecturerState {
   List<Object> get props => [];
 }
 
+class NoLiveSession extends LecturerState {
+  @override
+  List<Object> get props => [];
+}
+
 class Successful extends LecturerState {
   final String message;
 

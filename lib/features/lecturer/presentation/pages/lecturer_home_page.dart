@@ -22,7 +22,8 @@ class LecturerHomePage extends StatefulWidget {
 class _LecturerHomePageState extends State<LecturerHomePage> {
   String _name = '';
   SessionEntity? _liveSession;
-  bool _isLoadingSession = true; // prevent flash
+  bool _isLoadingSession = true;
+  bool _isEndingSession = false;
 
   @override
   void initState() {
@@ -39,22 +40,45 @@ class _LecturerHomePageState extends State<LecturerHomePage> {
   Widget build(BuildContext context) {
     return BlocListener<LecturerCubit, LecturerState>(
       listener: (context, state) {
-        print('LISTENER STATE: $state');
         if (state is NameFetched) {
-          print('SETTING NAME: ${state.name}');
           setState(() => _name = state.name);
+        } else if (state is Loading) {
+          if (_liveSession != null) {
+            setState(() => _isEndingSession = true);
+          }
+        } else if (state is NoLiveSession || state is Failed) {
+          setState(() {
+            _liveSession = null;
+            _isLoadingSession = false;
+            _isEndingSession = false;
+          });
+        } else if (state is LiveSessionFetched) {
+          setState(() {
+            _liveSession = (state as LiveSessionFetched).session;
+            _isLoadingSession = false;
+            _isEndingSession = false;
+          });
+        } else if (state is Failed) {
+          setState(() {
+            _isLoadingSession = false;
+            _isEndingSession = false;
+          });
         }
       },
-      child: BlocBuilder<LecturerCubit, LecturerState>(
-        builder: (context, state) {
-          if (state is Loading && _name.isEmpty) {
+      child: Builder(
+        builder: (context) {
+          final state = context.watch<LecturerCubit>().state;
+
+          if (_isLoadingSession) {
             return const Scaffold(
               body: Center(child: CircularProgressIndicator()),
             );
           }
-          if (state is LiveSessionFetched) {
-            return _buildLiveSession(context, state.session);
+
+          if (_liveSession != null) {
+            return _buildLiveSession(context, _liveSession!);
           }
+
           return _buildNoSession(context);
         },
       ),
@@ -86,22 +110,34 @@ class _LecturerHomePageState extends State<LecturerHomePage> {
           }
         },
       ),
-      body: CustomScrollView(
-        slivers: [
-          const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.sm)),
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.md,
-              0,
-              AppSpacing.sm,
-              120,
-            ),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate([
-                _SessionCard(model: uiModel, sessionId: session.sessionId),
-              ]),
-            ),
+      body: Stack(
+        children: [
+          CustomScrollView(
+            slivers: [
+              const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.sm)),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.md,
+                  0,
+                  AppSpacing.sm,
+                  120,
+                ),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    _SessionCard(model: uiModel, sessionId: session.sessionId),
+                  ]),
+                ),
+              ),
+            ],
           ),
+
+          if (_isEndingSession)
+            Container(
+              color: Colors.black.withOpacity(0.35),
+              child: const Center(
+                child: CircularProgressIndicator(color: AppColors.white),
+              ),
+            ),
         ],
       ),
       bottomNavigationBar: SafeArea(
@@ -156,12 +192,24 @@ class _LecturerHomePageState extends State<LecturerHomePage> {
           }
         },
       ),
-      body: const CustomScrollView(
-        slivers: [
-          SliverFillRemaining(
-            hasScrollBody: false,
-            child: _NoActiveSessionView(),
+      body: Stack(
+        children: [
+          const CustomScrollView(
+            slivers: [
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: _NoActiveSessionView(),
+              ),
+            ],
           ),
+
+          if (_isEndingSession)
+            Container(
+              color: Colors.black.withOpacity(0.35),
+              child: const Center(
+                child: CircularProgressIndicator(color: AppColors.white),
+              ),
+            ),
         ],
       ),
       bottomNavigationBar: SafeArea(

@@ -21,6 +21,7 @@ class CreateSessionPage extends StatefulWidget {
 class _CreateSessionPageState extends State<CreateSessionPage> {
   CourseEntity? selectedCourse;
   LocationEntity? selectedLocation;
+  bool _isSubmitting = false;
 
   bool get canStart => selectedCourse != null && selectedLocation != null;
 
@@ -28,6 +29,12 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
   Widget build(BuildContext context) {
     return BlocListener<LecturerCubit, LecturerState>(
       listener: (context, state) {
+        if (state is Loading) {
+          setState(() => _isSubmitting = true);
+        } else {
+          setState(() => _isSubmitting = false); // clear on any other state
+        }
+
         if (state is CoursesFetched) {
           _showCoursePicker(context, state.courses);
         }
@@ -239,14 +246,24 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                     borderRadius: BorderRadius.circular(18),
                   ),
                 ),
-                child: Text(
-                  'Start Attendance Session',
-                  style: AppTextStyles.bodyLarge.copyWith(
-                    fontSize: 16.5,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.white,
-                  ),
-                ),
+                child:
+                    _isSubmitting
+                        ? const SizedBox(
+                          height: 22,
+                          width: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: AppColors.white,
+                          ),
+                        )
+                        : Text(
+                          'Start Attendance Session',
+                          style: AppTextStyles.bodyLarge.copyWith(
+                            fontSize: 16.5,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.white,
+                          ),
+                        ),
               ),
             ),
           ),
