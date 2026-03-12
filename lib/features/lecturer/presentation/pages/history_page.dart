@@ -1,12 +1,15 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:attend/features/lecturer/domain/entities/session_entity.dart';
+import 'package:attend/features/lecturer/presentation/bloc/lecturer_cubit.dart';
 import 'package:attend/global/components/app_toast.dart';
 import 'package:attend/global/constants/colors.dart';
 import 'package:attend/global/constants/spacing.dart';
 import 'package:attend/global/constants/text_styles.dart';
 import 'package:excel/excel.dart' hide Border;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -21,14 +24,11 @@ class LecturerHistoryGradingPage extends StatefulWidget {
 
 class _LecturerHistoryGradingPageState extends State<LecturerHistoryGradingPage>
     with SingleTickerProviderStateMixin {
-  // ---- Demo data (replace with API/state later) ----
-  final List<_CourseUi> _courses = const [
-    _CourseUi(code: "CSC 301", title: "Data Structures & Algorithms"),
-    _CourseUi(code: "MTH 305", title: "Linear Algebra II"),
-    _CourseUi(code: "PHY 302", title: "Electromagnetism"),
-  ];
+  List<SessionEntity> _sessions = [];
+  int _totalSessions = 0;
 
-  late _CourseUi _selectedCourse = _courses.first;
+  bool _isLoading = true;
+  bool _hasFailed = false;
 
   // Grading config
   int _classesHeld = 12;
@@ -36,10 +36,15 @@ class _LecturerHistoryGradingPageState extends State<LecturerHistoryGradingPage>
 
   late final TabController _tabController;
 
+  String get _exportCourseCode =>
+      _sessions.isNotEmpty ? _sessions.first.course.courseCode : 'Course';
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    Future.microtask(() {
+      context.read<LecturerCubit>().fetchPastSessions();
+    });
   }
 
   @override
@@ -50,100 +55,135 @@ class _LecturerHistoryGradingPageState extends State<LecturerHistoryGradingPage>
 
   @override
   Widget build(BuildContext context) {
-    final sessions = _demoSessionsFor(_selectedCourse.code);
-    final totalSessions = sessions.length;
+    final sessions = _mappedSessions();
+    final totalSessions = _totalSessions;
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
+    return BlocListener<LecturerCubit, LecturerState>(
+      listener: (context, state) {
+        if (state is Loading) {
+          setState(() {
+            _isLoading = true;
+            _hasFailed = false;
+          });
+        }
+
+        if (state is PastSessionsFetched) {
+          setState(() {
+            _sessions = state.sessions;
+            _totalSessions = state.sessions.length;
+            _isLoading = false;
+            _hasFailed = false;
+          });
+        }
+
+        if (state is Failed) {
+          setState(() {
+            _isLoading = false;
+            _hasFailed = true;
+          });
+        }
+      },
+      child: Scaffold(
         backgroundColor: AppColors.background,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.primary),
-          onPressed: () => context.pop(),
-        ),
-        title: Text(
-          "History",
-          style: AppTextStyles.h2.copyWith(
-            fontSize: 20,
-            color: AppColors.primary,
+        appBar: AppBar(
+          backgroundColor: AppColors.background,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_rounded,
+              color: AppColors.primary,
+            ),
+            onPressed: () => context.pop(),
+          ),
+          title: Text(
+            "History",
+            style: AppTextStyles.h2.copyWith(
+              fontSize: 20,
+              color: AppColors.primary,
+            ),
+          ),
+          centerTitle: true,
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1),
+            child: Container(
+              height: 1,
+              color: AppColors.primary.withOpacity(0.06),
+            ),
           ),
         ),
-        centerTitle: true,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(
-            height: 1,
-            color: AppColors.primary.withOpacity(0.06),
-          ),
-        ),
-      ),
-      body: Column(
-        children: [
-          const SizedBox(height: AppSpacing.sm),
+        body: Column(
+          children: [
+            const SizedBox(height: AppSpacing.sm),
 
-          // Header controls (shared across tabs)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: _MiniStat(
-                        label: "Sessions",
-                        value: "$totalSessions",
-                        icon: Icons.calendar_month_rounded,
+            // Header controls (shared across tabs)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _MiniStat(
+                          label: "Sessions",
+                          value: "$totalSessions",
+                          icon: Icons.calendar_month_rounded,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
 
-          const SizedBox(height: AppSpacing.md),
+            const SizedBox(height: AppSpacing.md),
 
-          // Tab content
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _HistoryTab(sessions: sessions),
-                _GradingTab(
-                  classesHeld: _classesHeld,
-                  attendanceMarks: _attendanceMarks,
-                  onEditClassesHeld: () async {
-                    final v = await _pickNumber(
-                      title: "Classes held",
-                      subtitle:
-                          "How many classes will you hold for this course?",
-                      initial: _classesHeld,
-                      min: 1,
-                      max: 40,
-                    );
-                    if (!mounted || v == null) return;
-                    setState(() => _classesHeld = v);
-                  },
-                  onEditAttendanceMarks: () async {
-                    final v = await _pickNumber(
-                      title: "Attendance marks",
-                      subtitle: "How many marks should attendance carry?",
-                      initial: _attendanceMarks,
-                      min: 1,
-                      max: 30,
-                    );
-                    if (!mounted || v == null) return;
-                    setState(() => _attendanceMarks = v);
-                  },
-                  scoreExample: (attended) => _score(attended),
-                  onExport: _simulateExport,
-                ),
-              ],
+            // Tab content
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _HistoryTab(
+                    sessions: sessions,
+                    isLoading: _isLoading,
+                    hasFailed: _hasFailed,
+                    onRetry:
+                        () => context.read<LecturerCubit>().fetchPastSessions(),
+                  ),
+                  _GradingTab(
+                    classesHeld: _classesHeld,
+                    attendanceMarks: _attendanceMarks,
+                    onEditClassesHeld: () async {
+                      final v = await _pickNumber(
+                        title: "Classes held",
+                        subtitle:
+                            "How many classes will you hold for this course?",
+                        initial: _classesHeld,
+                        min: 1,
+                        max: 40,
+                      );
+                      if (!mounted || v == null) return;
+                      setState(() => _classesHeld = v);
+                    },
+                    onEditAttendanceMarks: () async {
+                      final v = await _pickNumber(
+                        title: "Attendance marks",
+                        subtitle: "How many marks should attendance carry?",
+                        initial: _attendanceMarks,
+                        min: 1,
+                        max: 30,
+                      );
+                      if (!mounted || v == null) return;
+                      setState(() => _attendanceMarks = v);
+                    },
+                    scoreExample: (attended) => _score(attended),
+                    onExport: _simulateExport,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -398,7 +438,7 @@ class _LecturerHistoryGradingPageState extends State<LecturerHistoryGradingPage>
     if (bytes == null) return;
 
     final dir = await getTemporaryDirectory();
-    final safeCourse = _selectedCourse.code.replaceAll(" ", "_");
+    final safeCourse = _exportCourseCode.replaceAll(" ", "_");
     final now = DateTime.now();
     final dateStr =
         "${now.day.toString().padLeft(2, '0')}-${now.month.toString().padLeft(2, '0')}-${now.year}";
@@ -420,104 +460,51 @@ class _LecturerHistoryGradingPageState extends State<LecturerHistoryGradingPage>
               "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         ),
       ],
-      subject: "${_selectedCourse.code} Attendance CA",
-      text: "Attendance CA export for ${_selectedCourse.code}.",
+      subject: "$_exportCourseCode Attendance CA",
+      text: "Attendance CA export for $_exportCourseCode.",
     );
 
     if (!mounted) return;
 
     AppToast.show(
       context: context,
-      message: "${_selectedCourse.code} CA exported",
+      message: "$_exportCourseCode CA exported",
       type: ToastType.success,
     );
   }
 
-  List<_SessionUi> _demoSessionsFor(String code) {
-    final all = <_SessionUi>[
-      _SessionUi(
-        courseCode: "CSC 301",
-        dateLabel: "Mon • Nov 10",
-        timeLabel: "10:00 – 12:00",
-        venue: "LH 201",
-        present: 47,
-        denied: 2,
-      ),
-      _SessionUi(
-        courseCode: "CSC 301",
-        dateLabel: "Wed • Nov 12",
-        timeLabel: "10:00 – 12:00",
-        venue: "LH 201",
-        present: 45,
-        denied: 1,
-      ),
-      _SessionUi(
-        courseCode: "CSC 301",
-        dateLabel: "Mon • Nov 17",
-        timeLabel: "10:00 – 12:00",
-        venue: "LH 201",
-        present: 50,
-        denied: 0,
-      ),
-      _SessionUi(
-        courseCode: "CSC 301",
-        dateLabel: "Mon • Nov 10",
-        timeLabel: "10:00 – 12:00",
-        venue: "LH 201",
-        present: 47,
-        denied: 2,
-      ),
-      _SessionUi(
-        courseCode: "CSC 301",
-        dateLabel: "Wed • Nov 12",
-        timeLabel: "10:00 – 12:00",
-        venue: "LH 201",
-        present: 45,
-        denied: 1,
-      ),
-      _SessionUi(
-        courseCode: "CSC 301",
-        dateLabel: "Mon • Nov 17",
-        timeLabel: "10:00 – 12:00",
-        venue: "LH 201",
-        present: 50,
-        denied: 0,
-      ),
-      _SessionUi(
-        courseCode: "CSC 301",
-        dateLabel: "Wed • Nov 12",
-        timeLabel: "10:00 – 12:00",
-        venue: "LH 201",
-        present: 45,
-        denied: 1,
-      ),
-      _SessionUi(
-        courseCode: "CSC 301",
-        dateLabel: "Mon • Nov 17",
-        timeLabel: "10:00 – 12:00",
-        venue: "LH 201",
-        present: 50,
-        denied: 0,
-      ),
-      _SessionUi(
-        courseCode: "MTH 305",
-        dateLabel: "Tue • Nov 11",
-        timeLabel: "08:00 – 10:00",
-        venue: "COLNAS Auditorium",
-        present: 122,
-        denied: 3,
-      ),
-      _SessionUi(
-        courseCode: "PHY 302",
-        dateLabel: "Thu • Nov 13",
-        timeLabel: "14:00 – 16:00",
-        venue: "LH 105",
-        present: 76,
-        denied: 2,
-      ),
-    ];
+  List<_SessionUi> _mappedSessions() {
+    return _sessions
+        .map(
+          (s) => _SessionUi(
+            courseCode: s.course.courseCode,
+            dateLabel: _formatDate(s.sessionDate),
+            timeLabel: '',
+            venue: s.location.name ?? '',
+            present: s.present ?? 0,
+            denied: s.denied ?? 0,
+          ),
+        )
+        .toList();
+  }
 
-    return all.where((s) => s.courseCode == code).toList();
+  String _formatDate(DateTime date) {
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return '${days[date.weekday - 1]} • ${months[date.month - 1]} ${date.day}';
   }
 }
 
@@ -525,10 +512,54 @@ class _LecturerHistoryGradingPageState extends State<LecturerHistoryGradingPage>
 
 class _HistoryTab extends StatelessWidget {
   final List<_SessionUi> sessions;
-  const _HistoryTab({required this.sessions});
+  final bool isLoading;
+  final bool hasFailed;
+  final VoidCallback onRetry;
+
+  const _HistoryTab({
+    required this.sessions,
+    required this.isLoading,
+    required this.hasFailed,
+    required this.onRetry,
+  });
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (hasFailed) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Failed to load sessions',
+              style: AppTextStyles.bodyLarge.copyWith(
+                color: AppColors.textPrimary.withOpacity(0.65),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            TextButton(onPressed: onRetry, child: const Text('Retry')),
+          ],
+        ),
+      );
+    }
+
+    if (sessions.isEmpty) {
+      return Center(
+        child: Text(
+          'No past sessions yet.',
+          style: AppTextStyles.bodyLarge.copyWith(
+            color: AppColors.textPrimary.withOpacity(0.65),
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      );
+    }
+
     return CustomScrollView(
       slivers: [
         SliverPadding(
@@ -686,100 +717,6 @@ class _GradingTab extends StatelessWidget {
 }
 
 // ---------------- UI Pieces ----------------
-
-class _CoursePicker extends StatelessWidget {
-  final List<_CourseUi> courses;
-  final _CourseUi selected;
-  final ValueChanged<_CourseUi> onChanged;
-
-  const _CoursePicker({
-    required this.courses,
-    required this.selected,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return _Card(
-      child: Row(
-        children: [
-          _SectionIcon(icon: Icons.class_rounded),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  selected.code,
-                  style: AppTextStyles.bodyLarge.copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.textPrimary,
-                    height: 1.1,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  selected.title,
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.textPrimary.withOpacity(0.70),
-                    fontWeight: FontWeight.w600,
-                    height: 1.2,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: AppSpacing.md),
-          PopupMenuButton<_CourseUi>(
-            tooltip: "",
-            color: AppColors.white,
-            onSelected: onChanged,
-            itemBuilder: (_) {
-              return courses
-                  .map(
-                    (c) => PopupMenuItem<_CourseUi>(
-                      value: c,
-                      child: Text(
-                        "${c.code} • ${c.title}",
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  )
-                  .toList();
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.06),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppColors.primary.withOpacity(0.08)),
-              ),
-              child: Row(
-                children: [
-                  Text(
-                    "Change",
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  const Icon(
-                    Icons.expand_more_rounded,
-                    color: AppColors.primary,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _MiniStat extends StatelessWidget {
   final String label;
@@ -966,7 +903,9 @@ class _SessionCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "${session.timeLabel} • ${session.venue}",
+                      session.timeLabel.isNotEmpty
+                          ? "${session.timeLabel} • ${session.venue}"
+                          : session.venue,
                       style: AppTextStyles.bodyMedium.copyWith(
                         color: AppColors.textPrimary.withOpacity(0.70),
                         fontWeight: FontWeight.w700,
@@ -989,7 +928,7 @@ class _SessionCard extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  "CSC 301",
+                  session.courseCode,
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.textPrimary.withOpacity(0.85),
                     fontWeight: FontWeight.w900,
@@ -1113,12 +1052,6 @@ class _SectionIcon extends StatelessWidget {
 }
 
 // ---------------- Data models ----------------
-
-class _CourseUi {
-  final String code;
-  final String title;
-  const _CourseUi({required this.code, required this.title});
-}
 
 class _SessionUi {
   final String courseCode;

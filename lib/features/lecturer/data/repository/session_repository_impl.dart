@@ -16,14 +16,17 @@ class SessionRepositoryImpl implements SessionRepository {
       remoteDataSource.endSession(sessionId);
 
   @override
-  Future<SessionEntity> fetchLiveSession(String lecturerId) async =>
-      remoteDataSource.fetchLiveSession(lecturerId);
+  Future<SessionEntity> fetchLiveSession() async =>
+      remoteDataSource.fetchLiveSession();
 
   @override
-  Future<int> fetchNumberOfPastSessions(String lecturerId) async =>
-      remoteDataSource.fetchNumberOfPastSessions(lecturerId);
+  Future<int> fetchNumberOfPastSessions() async =>
+      remoteDataSource.fetchNumberOfPastSessions();
 
   @override
-  Future<List<SessionEntity>> fetchPastSessions(String lecturerId) async =>
-      remoteDataSource.fetchPastSessions(lecturerId);
+  Future<List<SessionEntity>> fetchPastSessions() async =>
+      remoteDataSource.fetchPastSessions();
+
+  @override
+  Future<String> fetchName() async => remoteDataSource.fetchName();
 }

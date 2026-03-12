@@ -10,6 +10,35 @@ class SessionRemoteDataSourceImpl implements SessionRemoteDataSource {
   SessionRemoteDataSourceImpl({required this.client});
 
   @override
+  Future<int> fetchNumberOfPastSessions() async {
+    final response = await client.getRequest(
+      ApiEndpoints.fetchNumberOfPastSessions,
+    );
+
+    final data = response.data as Map<String, dynamic>;
+
+    return data['data']['count'] as int;
+  }
+
+  @override
+  Future<List<SessionEntity>> fetchPastSessions() async {
+    final response = await client.getRequest(ApiEndpoints.fetchPastSessions);
+
+    final List data = response.data['data'];
+
+    return data.map((session) => SessionModel.fromJson(session)).toList();
+  }
+
+  @override
+  Future<String> fetchName() async {
+    final response = await client.getRequest(ApiEndpoints.fetchName);
+    print('STATUS CODE: ${response.statusCode}');
+    print('RESPONSE DATA: ${response.data}');
+
+    return response.data['user']['name'] as String;
+  }
+
+  @override
   Future<void> createSession(SessionEntity sessionEntity) async {
     await client.postRequest(
       ApiEndpoints.createSession,
@@ -22,36 +51,21 @@ class SessionRemoteDataSourceImpl implements SessionRemoteDataSource {
 
   @override
   Future<void> endSession(String sessionId) async {
-    await client.postRequest(ApiEndpoints.endSession(sessionId));
-  }
-
-  @override
-  Future<SessionEntity> fetchLiveSession(String lecturerId) async {
-    final response = await client.getRequest<Map<String, dynamic>>(
-      ApiEndpoints.fetchLiveSession,
+    final response = await client.patchRequest(
+      ApiEndpoints.endSession(sessionId),
     );
-
-    final json = response.data?['data'] as Map<String, dynamic>;
-    return SessionModel.fromJson(json);
+    print('STATUS CODE: ${response.statusCode}');
+    print('RESPONSE DATA: ${response.data}');
   }
 
   @override
-  Future<int> fetchNumberOfPastSessions(String lecturerId) async {
-    final response = await client.getRequest(
-      ApiEndpoints.fetchNumberOfPastSessions,
-    );
+  Future<SessionEntity> fetchLiveSession() async {
+    final response = await client.getRequest(ApiEndpoints.fetchLiveSession);
+    print('STATUS CODE: ${response.statusCode}');
+    print('RESPONSE DATA: ${response.data}');
 
-    final data = response.data as Map<String, dynamic>;
-
-    return data['data']['count'] as int;
-  }
-
-  @override
-  Future<List<SessionEntity>> fetchPastSessions(String lecturerId) async {
-    final response = await client.getRequest(ApiEndpoints.fetchPastSessions);
-
-    final List data = response.data['data'];
-
-    return data.map((session) => SessionModel.fromJson(session)).toList();
+    final liveSession = SessionModel.fromJson(response.data['data']);
+    print('PARSED SESSION: $liveSession');
+    return liveSession;
   }
 }

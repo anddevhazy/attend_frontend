@@ -45,10 +45,11 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
             ),
           );
 
-          context.goNamed(
-            Routes.lecturerHomeName,
-            queryParameters: {"status": "active"},
-          );
+          context.read<LecturerCubit>().fetchLiveSession();
+        }
+
+        if (state is LiveSessionFetched) {
+          context.goNamed(Routes.lecturerHomeName);
         }
 
         if (state is Failed) {

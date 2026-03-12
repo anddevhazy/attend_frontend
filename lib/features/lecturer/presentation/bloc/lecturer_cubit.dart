@@ -3,6 +3,7 @@ import 'package:attend/features/lecturer/domain/entities/session_entity.dart';
 import 'package:attend/features/lecturer/domain/usecases/create_session_usecase.dart';
 import 'package:attend/features/lecturer/domain/usecases/end_session_usecase.dart';
 import 'package:attend/features/lecturer/domain/usecases/fetch_live_session_usecase.dart';
+import 'package:attend/features/lecturer/domain/usecases/fetch_name_usecaase.dart';
 import 'package:attend/features/lecturer/domain/usecases/fetch_number_of_past_sessions_usecase.dart';
 import 'package:attend/features/lecturer/domain/usecases/fetch_past_sessions_usecase.dart';
 import 'package:attend/features/lecturer/domain/usecases/get_courses_usecase.dart';
@@ -21,6 +22,7 @@ class LecturerCubit extends Cubit<LecturerState> {
   final FetchPastSessionsUsecase fetchPastSessionsUsecase;
   final GetCoursesUsecase getCoursesUsecase;
   final GetLocationsUsecase getLocationsUsecase;
+  final FetchNameUsecaase fetchNameUsecaase;
 
   LecturerCubit({
     required this.createSessionUsecase,
@@ -30,7 +32,36 @@ class LecturerCubit extends Cubit<LecturerState> {
     required this.fetchPastSessionsUsecase,
     required this.getCoursesUsecase,
     required this.getLocationsUsecase,
+    required this.fetchNameUsecaase,
   }) : super(Initial());
+
+  Future<void> fetchNumberOfPastSessions() async {
+    emit(Loading());
+
+    try {
+      final count = await fetchNumberOfPastSessionsUsecase.call();
+
+      emit(NumberOfPastSessionsFetched(count: count));
+    } catch (e) {
+      emit(
+        Failed(
+          message: "Failed to fetch number of past sessions: ${e.toString()}",
+        ),
+      );
+    }
+  }
+
+  Future<void> fetchPastSessions() async {
+    emit(Loading());
+
+    try {
+      final sessions = await fetchPastSessionsUsecase.call();
+
+      emit(PastSessionsFetched(sessions: sessions));
+    } catch (e) {
+      emit(Failed(message: "Failed to fetch past sessions: ${e.toString()}"));
+    }
+  }
 
   Future<void> startSession(SessionEntity sessionEntity) async {
     emit(Loading());
@@ -44,13 +75,16 @@ class LecturerCubit extends Cubit<LecturerState> {
     }
   }
 
-  Future<void> fetchLiveSession(String sessionId) async {
+  Future<void> fetchLiveSession() async {
     emit(Loading());
 
     try {
-      final liveSession = await fetchLiveSessionUsecase.call(sessionId);
+      final liveSession = await fetchLiveSessionUsecase.call();
       emit(LiveSessionFetched(session: liveSession));
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('FETCH LIVE SESSION ERROR: $e');
+      print('STACK TRACE: $stackTrace');
+
       emit(Failed(message: "Failed to fetch live session: ${e.toString()}"));
     }
   }
@@ -60,37 +94,14 @@ class LecturerCubit extends Cubit<LecturerState> {
 
     try {
       await endSessionUsecase.call(sessionId);
+      print('END SESSION SUCCESS, now fetching live session');
+
+      await fetchLiveSession();
       emit(Successful(message: "Session ended successfully"));
     } catch (e) {
+      print('END SESSION ERROR: $e');
+
       emit(Failed(message: "Failed to end session: ${e.toString()}"));
-    }
-  }
-
-  Future<void> fetchNumberOfPastSessions(String lecturerId) async {
-    emit(Loading());
-
-    try {
-      final count = await fetchNumberOfPastSessionsUsecase.call(lecturerId);
-
-      emit(NumberOfPastSessionsFetched(count: count));
-    } catch (e) {
-      emit(
-        Failed(
-          message: "Failed to fetch number of past sessions: ${e.toString()}",
-        ),
-      );
-    }
-  }
-
-  Future<void> fetchPastSessions(String lecturerId) async {
-    emit(Loading());
-
-    try {
-      final sessions = await fetchPastSessionsUsecase.call(lecturerId);
-
-      emit(PastSessionsFetched(sessions: sessions));
-    } catch (e) {
-      emit(Failed(message: "Failed to fetch past sessions: ${e.toString()}"));
     }
   }
 
@@ -114,7 +125,17 @@ class LecturerCubit extends Cubit<LecturerState> {
       emit(LocationsFetched(locations: locations));
     } catch (e) {
       emit(Failed(message: "Failed to fetch locations: ${e.toString()}"));
-      rethrow;
+    }
+  }
+
+  Future<void> fetchName() async {
+    try {
+      final name = await fetchNameUsecaase.call();
+      print('FETCH NAME SUCCESS: $name');
+      emit(NameFetched(name: name));
+    } catch (e) {
+      print('FETCH NAME ERROR: $e');
+      emit(Failed(message: "Failed to fetch name: ${e.toString()}"));
     }
   }
 }

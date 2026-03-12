@@ -173,10 +173,7 @@ class Routes {
       GoRoute(
         path: Routes.lecturerHomePath,
         name: Routes.lecturerHomeName,
-        builder: (context, state) {
-          final status = state.uri.queryParameters['status'];
-          return LecturerHomePage(initialStatus: status);
-        },
+        builder: (context, state) => const LecturerHomePage(),
       ),
       GoRoute(
         path: createSessionPath,

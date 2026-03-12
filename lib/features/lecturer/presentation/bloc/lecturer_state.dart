@@ -69,6 +69,15 @@ class LocationsFetched extends LecturerState {
   List<Object?> get props => [locations];
 }
 
+class NameFetched extends LecturerState {
+  final String name;
+
+  NameFetched({required this.name});
+
+  @override
+  List<Object?> get props => [name];
+}
+
 class Failed extends LecturerState {
   final String message;
 

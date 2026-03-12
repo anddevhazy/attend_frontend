@@ -1,6 +1,6 @@
-import 'package:attend/features/course/course_entity.dart';
+import 'package:attend/features/course/course_model.dart';
 import 'package:attend/features/lecturer/domain/entities/session_entity.dart';
-import 'package:attend/features/location/location_entity.dart';
+import 'package:attend/features/location/location_model.dart';
 
 class SessionModel extends SessionEntity {
   const SessionModel({
@@ -15,21 +15,13 @@ class SessionModel extends SessionEntity {
 
   factory SessionModel.fromJson(Map<String, dynamic> json) {
     return SessionModel(
-      sessionId: json['id'],
-      course: CourseEntity(
-        courseId: json['courseId'],
-        courseCode: '',
-        name: '',
-      ),
-      location: LocationEntity(locationId: json['locationId']),
-      isLive: json['status'] == 'live',
-      sessionDate: DateTime.parse(json['createdAt']),
-      present: json['present'],
-      denied: json['denied'],
+      sessionId: json["id"],
+      isLive: json["status"] == "live",
+      sessionDate: DateTime.parse(json["createdAt"]),
+      present: json["present"],
+      denied: json["denied"],
+      course: CourseModel.fromJson(json["course"]),
+      location: LocationModel.fromJson(json["location"]),
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'courseId': course.courseId, 'locationId': location.locationId};
   }
 }

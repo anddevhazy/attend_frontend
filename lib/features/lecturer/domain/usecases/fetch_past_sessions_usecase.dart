@@ -6,7 +6,7 @@ class FetchPastSessionsUsecase {
 
   FetchPastSessionsUsecase({required this.repository});
 
-  Future<List<SessionEntity>> call(String lecturerId) async {
-    return await repository.fetchPastSessions(lecturerId);
+  Future<List<SessionEntity>> call() async {
+    return await repository.fetchPastSessions();
   }
 }

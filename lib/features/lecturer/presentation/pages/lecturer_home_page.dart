@@ -1,112 +1,169 @@
 import 'dart:async';
 
+import 'package:attend/features/lecturer/domain/entities/session_entity.dart';
+import 'package:attend/features/lecturer/presentation/bloc/lecturer_cubit.dart';
+import 'package:attend/global/components/app_dialog.dart';
 import 'package:attend/global/constants/assets.dart';
 import 'package:attend/global/constants/colors.dart';
 import 'package:attend/global/constants/spacing.dart';
 import 'package:attend/global/constants/text_styles.dart';
 import 'package:attend/global/routes/routes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class LecturerHomePage extends StatefulWidget {
-  final String? initialStatus;
-  const LecturerHomePage({super.key, this.initialStatus});
+  const LecturerHomePage({super.key});
 
   @override
   State<LecturerHomePage> createState() => _LecturerHomePageState();
 }
 
 class _LecturerHomePageState extends State<LecturerHomePage> {
-  // Toggle to test both states
-  bool _hasActiveSession = true;
+  String _name = '';
+  SessionEntity? _liveSession;
+  bool _isLoadingSession = true; // prevent flash
 
   @override
   void initState() {
     super.initState();
-    if (widget.initialStatus == 'active') {
-      _hasActiveSession = true;
-    }
+    Future.microtask(() async {
+      await context.read<LecturerCubit>().fetchName();
+      if (mounted) {
+        context.read<LecturerCubit>().fetchLiveSession();
+      }
+    });
   }
-
-  @override
-  void didUpdateWidget(covariant LecturerHomePage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    // This triggers when you navigate back with new query parameters
-    if (widget.initialStatus == 'active' && !_hasActiveSession) {
-      setState(() {
-        _hasActiveSession = true;
-      });
-    } else if (widget.initialStatus != 'active' && _hasActiveSession) {
-      // Optional: Reset if status is removed, depends on your desired flow
-      // setState(() => _hasActiveSession = false);
-    }
-  }
-
-  // 3. Define the demo data
-  final _demoSession = const _SessionUiModel(
-    codeAndVenue: 'CSC 301 • 1k Cap',
-    title: 'Data Structures & Algorithms',
-    endsIn: '15:00',
-    marked: 0,
-    manualRequests: 0,
-    isLive: true,
-  );
-  // _SessionUiModel(
-  //   codeAndVenue: 'CSC 401 • LH 201',
-  //   title: 'Operating Systems',
-  //   endsIn: '18:02',
-  //   marked: 31,
-  //   manualRequests: 0,
-  //   isLive: true,
-  // ),
 
   @override
   Widget build(BuildContext context) {
-    final sessions = _hasActiveSession ? [_demoSession] : <_SessionUiModel>[];
+    return BlocListener<LecturerCubit, LecturerState>(
+      listener: (context, state) {
+        print('LISTENER STATE: $state');
+        if (state is NameFetched) {
+          print('SETTING NAME: ${state.name}');
+          setState(() => _name = state.name);
+        }
+      },
+      child: BlocBuilder<LecturerCubit, LecturerState>(
+        builder: (context, state) {
+          if (state is Loading && _name.isEmpty) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+          if (state is LiveSessionFetched) {
+            return _buildLiveSession(context, state.session);
+          }
+          return _buildNoSession(context);
+        },
+      ),
+    );
+  }
 
+  Widget _buildLiveSession(BuildContext context, SessionEntity session) {
+    final uiModel = _SessionUiModel(
+      codeAndVenue:
+          "${session.course.courseCode} • ${session.location.name ?? ""}",
+      title: session.course.name,
+      endsIn: "15:00",
+      marked: session.present ?? 0,
+      manualRequests: session.denied ?? 0,
+      isLive: session.isLive,
+    );
     return Scaffold(
       backgroundColor: AppColors.background,
-
-      // ✅ Proper top bar as AppBar (not part of body)
       appBar: _LecturerAppBar(
-        initials: 'DO',
+        initials: _name.isNotEmpty ? _name[0] : '',
         greeting: 'Welcome back ',
-        name: 'Dr. Okafor',
-        // 4. Secret Trigger Logic
+        name: _name,
         onNameTap: () {},
-        onHistoryTap: () {
-          context.pushNamed(Routes.lecturerHistoryName);
+        onHistoryTap: () async {
+          await context.pushNamed(Routes.lecturerHistoryName);
+          // Re-fetch when we return from history
+          if (mounted) {
+            context.read<LecturerCubit>().fetchLiveSession();
+          }
         },
       ),
       body: CustomScrollView(
         slivers: [
           const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.sm)),
-
-          if (sessions.isEmpty)
-            const SliverFillRemaining(
-              hasScrollBody: false,
-              child: _NoActiveSessionView(),
-            )
-          else
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.md,
-                0,
-                AppSpacing.sm,
-                120, // room for bottom CTA
-              ),
-              sliver: SliverList.separated(
-                itemCount: sessions.length,
-                separatorBuilder:
-                    (_, __) => const SizedBox(height: AppSpacing.lg),
-                itemBuilder: (_, i) => _SessionCard(model: sessions[i]),
-              ),
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.md,
+              0,
+              AppSpacing.sm,
+              120,
             ),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                _SessionCard(model: uiModel, sessionId: session.sessionId),
+              ]),
+            ),
+          ),
         ],
       ),
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.xl,
+            AppSpacing.md,
+            AppSpacing.xl,
+            AppSpacing.md,
+          ),
+          child: SizedBox(
+            height: 56,
+            child: ElevatedButton.icon(
+              onPressed: null,
+              icon: const Icon(Icons.play_arrow_rounded, size: 26),
+              label: Text(
+                'Start Session',
+                style: AppTextStyles.bodyLarge.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.white,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
-      // ✅ Bottom pinned CTA (fixes the "off" floating button vibe)
+  Widget _buildNoSession(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: _LecturerAppBar(
+        initials: _name.isNotEmpty ? _name[0] : '',
+        greeting: 'Welcome back ',
+        name: _name,
+        onNameTap: () {},
+        onHistoryTap: () async {
+          await context.pushNamed(Routes.lecturerHistoryName);
+          // Re-fetch when we return from history
+          if (mounted) {
+            context.read<LecturerCubit>().fetchLiveSession();
+          }
+        },
+      ),
+      body: const CustomScrollView(
+        slivers: [
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: _NoActiveSessionView(),
+          ),
+        ],
+      ),
       bottomNavigationBar: SafeArea(
         top: false,
         child: Padding(
@@ -131,7 +188,7 @@ class _LecturerHomePageState extends State<LecturerHomePage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: AppColors.white,
-                elevation: 0, // cleaner than FAB shadow
+                elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(18),
                 ),
@@ -149,14 +206,14 @@ class _LecturerAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String greeting;
   final String name;
   final VoidCallback onHistoryTap;
-  final VoidCallback onNameTap; // Add this
+  final VoidCallback onNameTap;
 
   const _LecturerAppBar({
     required this.initials,
     required this.greeting,
     required this.name,
     required this.onHistoryTap,
-    required this.onNameTap, // Add this
+    required this.onNameTap,
   });
 
   @override
@@ -205,7 +262,6 @@ class _LecturerAppBar extends StatelessWidget implements PreferredSizeWidget {
                   case 'history':
                     onHistoryTap();
                     break;
-
                   case 'logout':
                     // TODO: logout logic
                     break;
@@ -223,7 +279,6 @@ class _LecturerAppBar extends StatelessWidget implements PreferredSizeWidget {
                         ),
                       ),
                     ),
-
                     PopupMenuItem(
                       value: 'logout',
                       child: Text(
@@ -239,8 +294,6 @@ class _LecturerAppBar extends StatelessWidget implements PreferredSizeWidget {
           ],
         ),
       ),
-
-      // ✅ subtle divider so header feels “anchored”
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
         child: Container(height: 1, color: AppColors.primary.withOpacity(0.06)),
@@ -269,8 +322,9 @@ class _SessionUiModel {
 
 class _SessionCard extends StatefulWidget {
   final _SessionUiModel model;
+  final String sessionId; // add this
 
-  const _SessionCard({required this.model});
+  const _SessionCard({required this.model, required this.sessionId});
 
   @override
   State<_SessionCard> createState() => _SessionCardState();
@@ -305,7 +359,6 @@ class _SessionCardState extends State<_SessionCard> {
         });
       } else {
         timer.cancel();
-        // Optionally handle session expiry
       }
     });
   }
@@ -341,7 +394,6 @@ class _SessionCardState extends State<_SessionCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Header row: title + live pill
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -379,7 +431,6 @@ class _SessionCardState extends State<_SessionCard> {
 
           const SizedBox(height: AppSpacing.lg),
 
-          // Stats row (inside same card)
           Row(
             children: [
               Expanded(
@@ -402,12 +453,10 @@ class _SessionCardState extends State<_SessionCard> {
 
           const SizedBox(height: AppSpacing.lg),
 
-          // Divider to unify actions with session content (not separate card)
           Container(height: 1, color: AppColors.primary.withOpacity(0.06)),
 
           const SizedBox(height: AppSpacing.lg),
 
-          // Actions grid (still within same card)
           Row(
             children: [
               Expanded(
@@ -416,8 +465,19 @@ class _SessionCardState extends State<_SessionCard> {
                   subtitle: 'Close attendance',
                   icon: Icons.stop_circle_rounded,
                   tone: _ActionTone.danger,
-                  onTap: () {
-                    // TODO: end this session
+                  onTap: () async {
+                    final cubit = context.read<LecturerCubit>();
+
+                    final confirmed = await AppDialog.confirm(
+                      context: context,
+                      title: "End Session?",
+                      message: "This will close attendance for all students.",
+                      confirmText: "End",
+                    );
+
+                    if (confirmed == true) {
+                      cubit.endSession(widget.sessionId);
+                    }
                   },
                 ),
               ),
@@ -476,12 +536,11 @@ class _NoActiveSessionView extends StatelessWidget {
         AppSpacing.sm,
         AppSpacing.sm,
         AppSpacing.sm,
-        120, // room for bottom CTA
+        120,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Top-aligned, not floating in the middle
           Container(
             padding: const EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
@@ -525,10 +584,7 @@ class _NoActiveSessionView extends StatelessWidget {
               ],
             ),
           ),
-
           const SizedBox(height: AppSpacing.lg),
-
-          // A small “hint” block to reduce emptiness and guide usage
         ],
       ),
     );

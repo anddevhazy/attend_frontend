@@ -7,6 +7,7 @@ import 'package:attend/features/lecturer/domain/repositories/session_repository.
 import 'package:attend/features/lecturer/domain/usecases/create_session_usecase.dart';
 import 'package:attend/features/lecturer/domain/usecases/end_session_usecase.dart';
 import 'package:attend/features/lecturer/domain/usecases/fetch_live_session_usecase.dart';
+import 'package:attend/features/lecturer/domain/usecases/fetch_name_usecaase.dart';
 import 'package:attend/features/lecturer/domain/usecases/fetch_number_of_past_sessions_usecase.dart';
 import 'package:attend/features/lecturer/domain/usecases/fetch_past_sessions_usecase.dart';
 import 'package:attend/features/lecturer/domain/usecases/get_courses_usecase.dart';
@@ -25,6 +26,7 @@ Future<void> lecturerInjectionContainer() async {
       fetchPastSessionsUsecase: sl.call(),
       getCoursesUsecase: sl.call(),
       getLocationsUsecase: sl.call(),
+      fetchNameUsecaase: sl.call(),
     ),
   );
 
@@ -55,6 +57,10 @@ Future<void> lecturerInjectionContainer() async {
 
   sl.registerLazySingleton<GetLocationsUsecase>(
     () => GetLocationsUsecase(local: sl.call()),
+  );
+
+  sl.registerLazySingleton<FetchNameUsecaase>(
+    () => FetchNameUsecaase(repository: sl.call()),
   );
 
   // * REPOSITORY & DATA SOURCES INJECTION

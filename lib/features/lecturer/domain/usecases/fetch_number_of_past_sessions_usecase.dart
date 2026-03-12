@@ -5,7 +5,7 @@ class FetchNumberOfPastSessionsUsecase {
 
   FetchNumberOfPastSessionsUsecase({required this.repository});
 
-  Future<int> call(String lecturerId) async {
-    return await repository.fetchNumberOfPastSessions(lecturerId);
+  Future<int> call() async {
+    return await repository.fetchNumberOfPastSessions();
   }
 }

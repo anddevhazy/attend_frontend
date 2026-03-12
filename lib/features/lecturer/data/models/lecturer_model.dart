@@ -16,8 +16,4 @@ class LecturerModel extends LecturerEntity {
       role: json['user']['role'],
     );
   }
-
-  // Map<String, dynamic> toJson() {
-  //   return {'id': lecturerId, 'name': name, 'email': email, 'role': role};
-  // }
 }

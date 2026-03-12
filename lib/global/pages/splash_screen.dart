@@ -4,6 +4,8 @@ import 'package:attend/global/constants/spacing.dart';
 import 'package:attend/global/constants/text_styles.dart';
 import 'package:attend/global/enums/role.dart';
 import 'package:attend/global/routes/routes.dart';
+import 'package:attend/global/storage/token_storage.dart';
+import 'package:attend/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -19,20 +21,24 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-
-    // Hide system UI for the splash
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
 
-    // Navigate after 2.5 seconds
-    Future.delayed(const Duration(milliseconds: 2500), () {
+    Future.delayed(const Duration(milliseconds: 2500), () async {
       if (!mounted) return;
-
-      // Restore system UI for the rest of the app
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
-      // Go to onboarding
-      // context.goNamed(Routes.loginName);
-      context.goNamed(Routes.loginName, extra: Role.lecturer);
+      final tokenStorage = sl<TokenStorage>();
+      final accessToken = await tokenStorage.getAccessToken();
+      final refreshToken = await tokenStorage.getRefreshToken();
+
+      if (!mounted) return;
+
+      if (accessToken != null && refreshToken != null) {
+        // Already logged in — go straight to lecturer home (or check role)
+        context.goNamed(Routes.lecturerHomeName);
+      } else {
+        context.goNamed(Routes.loginName, extra: Role.lecturer);
+      }
     });
   }
 
